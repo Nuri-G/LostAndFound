@@ -1,10 +1,11 @@
-package com.codepath.nurivan.lostandfound;
+package com.codepath.nurivan.lostandfound.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.util.Log;
 
+import com.codepath.nurivan.lostandfound.R;
 import com.parse.Parse;
 import com.parse.ParseObject;
 import com.parse.ParseUser;

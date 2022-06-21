@@ -1,4 +1,4 @@
-package com.codepath.nurivan.lostandfound;
+package com.codepath.nurivan.lostandfound.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
