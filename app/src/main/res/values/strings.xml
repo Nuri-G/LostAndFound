@@ -9,4 +9,5 @@
     <string name="lost_amp_found"><![CDATA[Lost & Found]]></string>
     <string name="matches">Matches</string>
     <string name="profile">Profile</string>
+    <string name="confirm_password">Confirm Password</string>
 </resources>

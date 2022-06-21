@@ -8,29 +8,37 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.codepath.nurivan.lostandfound.databinding.ActivityLoginBinding;
+import com.codepath.nurivan.lostandfound.databinding.ActivityLogInBinding;
 import com.parse.ParseUser;
 
-public class LoginActivity extends AppCompatActivity {
+public class LogInActivity extends AppCompatActivity {
     public static final String TAG = "LoginActivity";
-    private ActivityLoginBinding binding;
+    private ActivityLogInBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityLoginBinding.inflate(getLayoutInflater());
+        binding = ActivityLogInBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
+
+        ParseUser.logOut();
+
+        if(ParseUser.getCurrentUser() != null) {
+            goMainActivity();
+        }
 
         binding.bLogIn.setOnClickListener(v -> {
             String username = binding.etUsername.getText().toString();
             String password = binding.etPassword.getText().toString();
 
-            loginUser(username, password);
+            logInUser(username, password);
         });
+
+        binding.bSignUp.setOnClickListener(v -> goSignUpActivity());
     }
 
-    private void loginUser(String username, String password) {
+    private void logInUser(String username, String password) {
 
         ParseUser.logOut();
         ParseUser.logInInBackground(username, password, (user, e) -> {
@@ -43,8 +51,13 @@ public class LoginActivity extends AppCompatActivity {
 
             goMainActivity();
 
-            Toast.makeText(LoginActivity.this, "Logged in.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(LogInActivity.this, "Logged in.", Toast.LENGTH_SHORT).show();
         });
+    }
+
+    private void goSignUpActivity() {
+        Intent i = new Intent(this, SignUpActivity.class);
+        startActivity(i);
     }
 
     private void goMainActivity() {
