@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -25,13 +26,14 @@ public class SignUpActivity extends AppCompatActivity {
         binding.bSignUp.setOnClickListener(v -> {
             String username = binding.etUsername.getText().toString();
             String password = binding.etPassword.getText().toString();
+            String homeAddress = binding.etHomeAddress.getText().toString();
             String confirmedPassword = binding.etConfirmPassword.getText().toString();
 
-            signUpUser(username, password, confirmedPassword);
+            signUpUser(username, homeAddress, password, confirmedPassword);
         });
     }
 
-    private void signUpUser(String username, String password, String confirmedPassword) {
+    private void signUpUser(String username, String homeAddress, String password, String confirmedPassword) {
 
         if(!confirmedPassword.equals(password)) {
             Toast.makeText(this, "Passwords do not match.", Toast.LENGTH_SHORT).show();
@@ -48,12 +50,16 @@ public class SignUpActivity extends AppCompatActivity {
         user.setPassword(password);
         user.setUsername(username);
 
+        // TODO - Need to verify that home address is a real place
+        user.put("homeAddress", homeAddress);
+
         user.signUpInBackground(e -> {
             if (e == null) {
                 Toast.makeText(SignUpActivity.this, "Created account.", Toast.LENGTH_SHORT).show();
                 showMainActivity();
             } else {
                 Toast.makeText(SignUpActivity.this, "Failed to make account.", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Failed to sign up user", e);
             }
         });
     }

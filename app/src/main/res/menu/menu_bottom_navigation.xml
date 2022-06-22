@@ -2,12 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_feed"
+        android:id="@+id/action_lost"
         android:enabled="true"
         android:title="@string/lost"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_post"
+        android:id="@+id/action_found"
         android:enabled="true"
         android:title="@string/found"
         app:showAsAction="ifRoom" />
