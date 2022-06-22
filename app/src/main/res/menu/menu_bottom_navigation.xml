@@ -4,12 +4,12 @@
     <item
         android:id="@+id/action_feed"
         android:enabled="true"
-        android:title="@string/lost_amp_found"
+        android:title="@string/lost"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_post"
         android:enabled="true"
-        android:title="@string/matches"
+        android:title="@string/found"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_profile"

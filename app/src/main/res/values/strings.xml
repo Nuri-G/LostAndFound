@@ -6,8 +6,9 @@
     <string name="log_in">Log In</string>
     <string name="sign_up">Sign Up</string>
     <string name="or">OR</string>
-    <string name="lost_amp_found"><![CDATA[Lost & Found]]></string>
     <string name="matches">Matches</string>
     <string name="profile">Profile</string>
     <string name="confirm_password">Confirm Password</string>
+    <string name="lost">Lost</string>
+    <string name="found">Found</string>
 </resources>
