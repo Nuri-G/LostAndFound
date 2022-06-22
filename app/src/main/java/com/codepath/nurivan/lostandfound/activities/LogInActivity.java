@@ -25,7 +25,7 @@ public class LogInActivity extends AppCompatActivity {
         ParseUser.logOut();
 
         if(ParseUser.getCurrentUser() != null) {
-            goMainActivity();
+            showMainActivity();
         }
 
         binding.bLogIn.setOnClickListener(v -> {
@@ -35,7 +35,7 @@ public class LogInActivity extends AppCompatActivity {
             logInUser(username, password);
         });
 
-        binding.bSignUp.setOnClickListener(v -> goSignUpActivity());
+        binding.bSignUp.setOnClickListener(v -> showSignUpActivity());
     }
 
     private void logInUser(String username, String password) {
@@ -49,18 +49,18 @@ public class LogInActivity extends AppCompatActivity {
             }
 
 
-            goMainActivity();
+            showMainActivity();
 
             Toast.makeText(LogInActivity.this, "Logged in.", Toast.LENGTH_SHORT).show();
         });
     }
 
-    private void goSignUpActivity() {
+    private void showSignUpActivity() {
         Intent i = new Intent(this, SignUpActivity.class);
         startActivity(i);
     }
 
-    private void goMainActivity() {
+    private void showMainActivity() {
         Intent i = new Intent(this, MainActivity.class);
         startActivity(i);
         finish();

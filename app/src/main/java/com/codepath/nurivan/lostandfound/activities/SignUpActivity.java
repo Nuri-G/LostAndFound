@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -52,14 +51,14 @@ public class SignUpActivity extends AppCompatActivity {
         user.signUpInBackground(e -> {
             if (e == null) {
                 Toast.makeText(SignUpActivity.this, "Created account.", Toast.LENGTH_SHORT).show();
-                goMainActivity();
+                showMainActivity();
             } else {
                 Toast.makeText(SignUpActivity.this, "Failed to make account.", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void goMainActivity() {
+    private void showMainActivity() {
         Intent i = new Intent(this, MainActivity.class);
         startActivity(i);
         finish();
