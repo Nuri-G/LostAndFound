@@ -30,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
         final Fragment foundFragment = new FoundFragment();
         final Fragment profileFragment = new ProfileFragment();
 
+
+
         binding.bottomNavigation.setOnItemSelectedListener(item -> {
             Fragment fragment;
 

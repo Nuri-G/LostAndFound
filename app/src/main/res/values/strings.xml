@@ -15,4 +15,10 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="log_out">Log Out</string>
+    <string name="where_did_you_lose_it">Where did you lose it?</string>
+    <string name="next">Next</string>
+    <string name="enter_coordinates">Enter Coordinates</string>
+    <string name="what_did_you_lose">What did you lose?</string>
+    <string name="enter_item_name">Enter Item Name</string>
+    <string name="find_my_item">Find My Item!</string>
 </resources>

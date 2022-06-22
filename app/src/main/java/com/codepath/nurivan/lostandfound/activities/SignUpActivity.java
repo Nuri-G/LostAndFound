@@ -50,6 +50,7 @@ public class SignUpActivity extends AppCompatActivity {
         user.setPassword(password);
         user.setUsername(username);
 
+
         // TODO - Need to verify that home address is a real place
         user.put("homeAddress", homeAddress);
 
