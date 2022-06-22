@@ -22,8 +22,6 @@ public class LogInActivity extends AppCompatActivity {
         View view = binding.getRoot();
         setContentView(view);
 
-        ParseUser.logOut();
-
         if(ParseUser.getCurrentUser() != null) {
             showMainActivity();
         }
