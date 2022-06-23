@@ -2,6 +2,7 @@ package com.codepath.nurivan.lostandfound.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -17,6 +18,8 @@ public class ItemLocationActivity extends AppCompatActivity {
     public static final String TAG = "ItemLocationActivity";
     private static final String LOST_QUESTION = "Where did you lose it?";
     private static final String FOUND_QUESTION = "Where did you find it?";
+    private static final String LOST_BUTTON = "Find my item!";
+    private static final String FOUND_BUTTON = "Next";
 
     ActivityItemLocationBinding binding;
 
@@ -33,19 +36,21 @@ public class ItemLocationActivity extends AppCompatActivity {
 
         if(item instanceof LostItem) {
             binding.tvLocation.setText(LOST_QUESTION);
+            binding.bFind.setText(LOST_BUTTON);
         } else if(item instanceof FoundItem) {
             binding.tvLocation.setText(FOUND_QUESTION);
+            binding.bFind.setText(FOUND_BUTTON);
         }
 
 
         binding.bFind.setOnClickListener(v -> {
             String latitudeString = binding.etLatitude.getText().toString();
             String longitudeString = binding.etLongitude.getText().toString();
-            uploadItem(item, latitudeString, longitudeString);
+            updateItem(item, latitudeString, longitudeString);
         });
     }
 
-    private void uploadItem(Item item, String latitudeString, String longitudeString) {
+    private void updateItem(Item item, String latitudeString, String longitudeString) {
         if(latitudeString.length() == 0 || longitudeString.length() == 0) {
             Toast.makeText(this, "Please enter a value for latitude and longitude.", Toast.LENGTH_SHORT).show();
             return;
@@ -62,11 +67,22 @@ public class ItemLocationActivity extends AppCompatActivity {
         ParseGeoPoint parseGeoPoint = new ParseGeoPoint(latitude, longitude);
         item.setItemLocation(parseGeoPoint);
 
-        item.saveInBackground(e -> {
-            if(e != null) {
-                Log.e(TAG, "Failed to save item.", e);
-            }
-        });
+        if(item instanceof LostItem) {
+            item.saveInBackground(e -> {
+                if(e != null) {
+                    Log.e(TAG, "Failed to save item.", e);
+                }
+            });
+            finish();
+        } else if(item instanceof FoundItem) {
+            showItemDetailsActivity((FoundItem) item);
+        }
+    }
+
+    private void showItemDetailsActivity(FoundItem item) {
+        Intent i = new Intent(this, ItemDetailsActivity.class);
+        i.putExtra(FoundItem.class.getSimpleName(), item);
+        startActivity(i);
         finish();
     }
 }

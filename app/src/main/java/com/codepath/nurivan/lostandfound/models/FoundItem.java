@@ -3,6 +3,7 @@ package com.codepath.nurivan.lostandfound.models;
 import com.parse.ParseClassName;
 import com.parse.ParseUser;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 @ParseClassName("FoundItem")
@@ -22,7 +23,21 @@ public class FoundItem extends Item {
         return getJSONObject(KEY_ITEM_DETAILS);
     }
 
-    public void setItemDetail(JSONObject details) {
+    public void setItemDetails(JSONObject details) {
         put(KEY_ITEM_DETAILS, details);
+    }
+
+    public void setItemDetail(String key, String value) {
+        JSONObject itemDetails = getItemDetails();
+        if(itemDetails == null) {
+            itemDetails = new JSONObject();
+        }
+        try {
+            itemDetails.put(key, value);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        put(KEY_ITEM_DETAILS, itemDetails);
     }
 }

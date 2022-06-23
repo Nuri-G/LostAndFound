@@ -24,4 +24,12 @@
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
     <string name="add_item">Add Item</string>
+    <string name="how_would_you_describe_it">How would you describe it?</string>
+    <string name="find_the_owner">Find the owner!</string>
+    <string name="color">Color:</string>
+    <string name="color_spinner">Color Spinner</string>
+    <string name="category">Category:</string>
+    <string name="category_spinner">Category Spinner</string>
+    <string name="size">Size:</string>
+    <string name="pattern">Pattern:</string>
 </resources>
