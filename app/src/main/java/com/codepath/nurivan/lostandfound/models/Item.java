@@ -11,8 +11,8 @@ public class Item extends ParseObject {
     public String getItemName() {
         return getString(KEY_ITEM_NAME);
     }
-    public void setItemName(String user) {
-        put(KEY_ITEM_NAME, user);
+    public void setItemName(String name) {
+        put(KEY_ITEM_NAME, name);
     }
 
     public ParseGeoPoint getItemLocation() {

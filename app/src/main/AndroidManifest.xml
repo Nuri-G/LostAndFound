@@ -29,6 +29,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activities.lost_item.LostItemNameActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.lost_item.LostItemLocationActivity"
+            android:exported="false" />
+
 
         <meta-data
             android:name="com.parse.SERVER_URL"

@@ -5,6 +5,7 @@ import com.parse.ParseUser;
 
 @ParseClassName("LostItem")
 public class LostItem extends Item {
+
     public static final String KEY_LOST_BY = "lostBy";
 
     public ParseUser getLostBy() {

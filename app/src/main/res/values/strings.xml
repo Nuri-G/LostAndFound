@@ -21,4 +21,7 @@
     <string name="what_did_you_lose">What did you lose?</string>
     <string name="enter_item_name">Enter Item Name</string>
     <string name="find_my_item">Find My Item!</string>
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="add_item">Add Item</string>
 </resources>
