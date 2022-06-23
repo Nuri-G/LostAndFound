@@ -52,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
+        binding.bottomNavigation.setSelectedItemId(R.id.action_lost);
+
         Log.i(TAG, "Current User: " + ParseUser.getCurrentUser().getUsername());
     }
 }
