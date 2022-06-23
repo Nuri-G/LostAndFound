@@ -5,7 +5,7 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 public class Item extends ParseObject {
-    public static final String KEY_ITEM_NAME = "name";
+    public static final String KEY_ITEM_NAME = "itemName";
     public static final String KEY_ITEM_LOCATION = "itemLocation";
 
     public String getItemName() {
@@ -19,7 +19,7 @@ public class Item extends ParseObject {
         return getParseGeoPoint(KEY_ITEM_LOCATION);
     }
 
-    public void setLocation(ParseGeoPoint itemLocation) {
+    public void setItemLocation(ParseGeoPoint itemLocation) {
         put(KEY_ITEM_LOCATION, itemLocation);
     }
 

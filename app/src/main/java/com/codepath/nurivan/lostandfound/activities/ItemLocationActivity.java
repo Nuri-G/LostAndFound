@@ -1,4 +1,4 @@
-package com.codepath.nurivan.lostandfound.activities.lost_item;
+package com.codepath.nurivan.lostandfound.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -7,34 +7,45 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.codepath.nurivan.lostandfound.databinding.ActivityLostItemLocationBinding;
+import com.codepath.nurivan.lostandfound.databinding.ActivityItemLocationBinding;
+import com.codepath.nurivan.lostandfound.models.FoundItem;
+import com.codepath.nurivan.lostandfound.models.Item;
 import com.codepath.nurivan.lostandfound.models.LostItem;
 import com.parse.ParseGeoPoint;
 
-public class LostItemLocationActivity extends AppCompatActivity {
-    public static final String TAG = "LostItemLocationActivity";
+public class ItemLocationActivity extends AppCompatActivity {
+    public static final String TAG = "ItemLocationActivity";
+    private static final String LOST_QUESTION = "Where did you lose it?";
+    private static final String FOUND_QUESTION = "Where did you find it?";
 
-    ActivityLostItemLocationBinding binding;
+    ActivityItemLocationBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivityLostItemLocationBinding.inflate(getLayoutInflater());
+        binding = ActivityItemLocationBinding.inflate(getLayoutInflater());
 
         View view = binding.getRoot();
         setContentView(view);
 
-        LostItem lostItem = getIntent().getParcelableExtra(LostItem.class.getSimpleName());
+        Item item = getIntent().getParcelableExtra(Item.class.getSimpleName());
+
+        if(item instanceof LostItem) {
+            binding.tvLocation.setText(LOST_QUESTION);
+        } else if(item instanceof FoundItem) {
+            binding.tvLocation.setText(FOUND_QUESTION);
+        }
+
 
         binding.bFind.setOnClickListener(v -> {
             String latitudeString = binding.etLatitude.getText().toString();
             String longitudeString = binding.etLongitude.getText().toString();
-            uploadLostItem(lostItem, latitudeString, longitudeString);
+            uploadItem(item, latitudeString, longitudeString);
         });
     }
 
-    private void uploadLostItem(LostItem lostItem, String latitudeString, String longitudeString) {
+    private void uploadItem(Item item, String latitudeString, String longitudeString) {
         if(latitudeString.length() == 0 || longitudeString.length() == 0) {
             Toast.makeText(this, "Please enter a value for latitude and longitude.", Toast.LENGTH_SHORT).show();
             return;
@@ -49,9 +60,9 @@ public class LostItemLocationActivity extends AppCompatActivity {
         }
 
         ParseGeoPoint parseGeoPoint = new ParseGeoPoint(latitude, longitude);
-        lostItem.setLocation(parseGeoPoint);
+        item.setItemLocation(parseGeoPoint);
 
-        lostItem.saveInBackground(e -> {
+        item.saveInBackground(e -> {
             if(e != null) {
                 Log.e(TAG, "Failed to save item.", e);
             }

@@ -10,8 +10,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.codepath.nurivan.lostandfound.activities.lost_item.LostItemNameActivity;
+import com.codepath.nurivan.lostandfound.activities.ItemNameActivity;
 import com.codepath.nurivan.lostandfound.databinding.FragmentLostBinding;
+import com.codepath.nurivan.lostandfound.models.Item;
+import com.codepath.nurivan.lostandfound.models.LostItem;
 
 public class LostFragment extends Fragment {
 
@@ -35,7 +37,7 @@ public class LostFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        binding.bAdd.setOnClickListener(v -> showLostItemNameActivity());
+        binding.bAdd.setOnClickListener(v -> showItemNameActivity());
     }
 
     @Override
@@ -44,8 +46,10 @@ public class LostFragment extends Fragment {
         binding = null;
     }
 
-    private void showLostItemNameActivity() {
-        Intent i = new Intent(getActivity(), LostItemNameActivity.class);
+    private void showItemNameActivity() {
+        Item item = new LostItem();
+        Intent i = new Intent(getActivity(), ItemNameActivity.class);
+        i.putExtra(Item.class.getSimpleName(), item);
 
         startActivity(i);
     }

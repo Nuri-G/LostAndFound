@@ -30,10 +30,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.lost_item.LostItemNameActivity"
+            android:name=".activities.ItemNameActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.lost_item.LostItemLocationActivity"
+            android:name=".activities.ItemLocationActivity"
             android:exported="false" />
 
 
