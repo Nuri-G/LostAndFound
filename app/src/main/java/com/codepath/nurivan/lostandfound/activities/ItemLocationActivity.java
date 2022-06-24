@@ -80,7 +80,7 @@ public class ItemLocationActivity extends AppCompatActivity {
     }
 
     private void showItemDetailsActivity(FoundItem item) {
-        Intent i = new Intent(this, ItemDetailsActivity.class);
+        Intent i = new Intent(this, ItemDescriptionActivity.class);
         i.putExtra(FoundItem.class.getSimpleName(), item);
         startActivity(i);
         finish();

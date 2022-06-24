@@ -13,7 +13,7 @@ import com.codepath.nurivan.lostandfound.R;
 import com.codepath.nurivan.lostandfound.databinding.ActivityItemDetailsBinding;
 import com.codepath.nurivan.lostandfound.models.FoundItem;
 
-public class ItemDetailsActivity extends AppCompatActivity {
+public class ItemDescriptionActivity extends AppCompatActivity {
     public static final String TAG = "ItemDetailsActivity";
 
     ActivityItemDetailsBinding binding;

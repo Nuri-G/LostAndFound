@@ -10,8 +10,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.codepath.nurivan.lostandfound.R;
 import com.codepath.nurivan.lostandfound.databinding.ItemLayoutBinding;
+import com.codepath.nurivan.lostandfound.models.FoundItem;
 import com.codepath.nurivan.lostandfound.models.Item;
+import com.codepath.nurivan.lostandfound.models.LostItem;
 
+import java.util.Date;
 import java.util.List;
 
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
@@ -58,7 +61,15 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
             String coordinates = "(" + latitude + ", " + longitude + ")";
 
             binding.tvCoordinates.setText(coordinates);
-            binding.tvDate.setText(item.getCreatedAt().toString());
+
+            Date date = new Date();
+
+            if(item instanceof LostItem) {
+                date.setTime(((LostItem) item).getTimeLost().getTime());
+            } else if(item instanceof FoundItem) {
+                date.setTime(((FoundItem) item).getTimeFound().getTime());
+            }
+            binding.tvDate.setText(date.toString());
         }
     }
 }

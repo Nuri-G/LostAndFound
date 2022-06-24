@@ -38,7 +38,7 @@ public class ItemNameActivity extends AppCompatActivity {
             binding.tvName.setText(FOUND_QUESTION);
         }
 
-        binding.bNext.setOnClickListener(v -> {
+        binding.bToTime.setOnClickListener(v -> {
             String name = binding.etItemName.getText().toString();
             name = name.trim();
 
@@ -49,12 +49,12 @@ public class ItemNameActivity extends AppCompatActivity {
 
             item.setItemName(name);
 
-            showItemLocationActivity(item);
+            showItemTimeActivity(item);
         });
     }
 
-    private void showItemLocationActivity(Item item) {
-        Intent i = new Intent(this, ItemLocationActivity.class);
+    private void showItemTimeActivity(Item item) {
+        Intent i = new Intent(this, ItemTimeActivity.class);
         i.putExtra(Item.class.getSimpleName(), item);
         startActivity(i);
         finish();
