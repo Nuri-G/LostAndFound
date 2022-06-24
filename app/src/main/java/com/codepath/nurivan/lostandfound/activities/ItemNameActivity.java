@@ -14,8 +14,8 @@ import com.codepath.nurivan.lostandfound.models.LostItem;
 import com.parse.ParseUser;
 
 public class ItemNameActivity extends AppCompatActivity {
-    private static final String LOST_QUESTION = "Where did you lose it?";
-    private static final String FOUND_QUESTION = "Where did you find it?";
+    private static final String LOST_QUESTION = "What did you lose?";
+    private static final String FOUND_QUESTION = "What did you find?";
 
     ActivityItemNameBinding binding;
 
