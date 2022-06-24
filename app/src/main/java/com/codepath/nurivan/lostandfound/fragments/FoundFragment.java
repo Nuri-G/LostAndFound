@@ -17,8 +17,6 @@ import com.codepath.nurivan.lostandfound.adapters.ItemAdapter;
 import com.codepath.nurivan.lostandfound.databinding.FragmentFoundBinding;
 import com.codepath.nurivan.lostandfound.models.FoundItem;
 import com.codepath.nurivan.lostandfound.models.Item;
-import com.parse.FindCallback;
-import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
