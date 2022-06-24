@@ -54,6 +54,11 @@ public class FoundFragment extends Fragment {
 
         adapter = new ItemAdapter(getContext(), items);
         binding.rvFoundItems.setAdapter(adapter);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
 
         getFoundItems();
     }

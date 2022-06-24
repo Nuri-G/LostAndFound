@@ -55,6 +55,11 @@ public class LostFragment extends Fragment {
 
         adapter = new ItemAdapter(getContext(), items);
         binding.rvLostItems.setAdapter(adapter);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
 
         getLostItems();
     }
