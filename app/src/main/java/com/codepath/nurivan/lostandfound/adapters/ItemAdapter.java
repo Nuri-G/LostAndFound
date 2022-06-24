@@ -78,7 +78,6 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
 
         @Override
         public void onClick(View v) {
-            System.out.println("###################");
             Intent i = new Intent(context, ItemDetailsActivity.class);
             i.putExtra(Item.class.getSimpleName(), item);
 
