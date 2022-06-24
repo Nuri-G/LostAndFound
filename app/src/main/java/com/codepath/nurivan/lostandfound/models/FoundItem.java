@@ -6,11 +6,14 @@ import com.parse.ParseUser;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Date;
+
 @ParseClassName("FoundItem")
 public class FoundItem extends Item {
     public static final String KEY_FOUND_BY = "foundBy";
     //This will be the details used to generate the quiz like any colors or patterns the item has.
     public static final String KEY_ITEM_DETAILS = "itemDetails";
+    public static final String KEY_TIME_FOUND = "timeFound";
 
     public ParseUser getFoundBy() {
         return getParseUser(KEY_FOUND_BY);
@@ -39,5 +42,13 @@ public class FoundItem extends Item {
         }
 
         put(KEY_ITEM_DETAILS, itemDetails);
+    }
+
+    public void setTimeFound(Date timeFound) {
+        put(KEY_TIME_FOUND, timeFound);
+    }
+
+    public Date getTimeFound() {
+        return getDate(KEY_TIME_FOUND);
     }
 }
