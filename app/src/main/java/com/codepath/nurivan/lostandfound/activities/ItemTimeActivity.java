@@ -34,27 +34,28 @@ public class ItemTimeActivity extends AppCompatActivity {
 
         Item item = getIntent().getParcelableExtra(Item.class.getSimpleName());
 
+        Date date = new Date();
+
         if(item instanceof LostItem) {
+            LostItem lostItem = (LostItem) item;
             binding.tvTime.setText(LOST_QUESTION);
+            if(lostItem.getTimeLost() != null) {
+                date = lostItem.getTimeLost();
+            }
         } else if(item instanceof FoundItem) {
+            FoundItem foundItem = (FoundItem) item;
             binding.tvTime.setText(FOUND_QUESTION);
+            if(foundItem.getTimeFound() != null) {
+                date = foundItem.getTimeFound();
+            }
         }
 
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        binding.dpItemTime.updateDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+
         binding.bToLocation.setOnClickListener(v -> {
-            Date date = getDateFromDatePicker(binding.dpItemTime);
-            Date current = new Date();
-
-
-            if(date.after(current)) {
-                Toast.makeText(this, "Please enter a date on or before today.", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if(item instanceof LostItem) {
-                ((LostItem) item).setTimeLost(date);
-            } else if(item instanceof FoundItem) {
-                ((FoundItem) item).setTimeFound(date);
-            }
+            setItemDate(item);
 
             showItemLocationActivity(item);
         });
@@ -69,6 +70,23 @@ public class ItemTimeActivity extends AppCompatActivity {
         calendar.set(year, month, day);
 
         return calendar.getTime();
+    }
+
+    private void setItemDate(Item item) {
+        Date date = getDateFromDatePicker(binding.dpItemTime);
+        Date current = new Date();
+
+
+        if(date.after(current)) {
+            Toast.makeText(this, "Please enter a date on or before today.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if(item instanceof LostItem) {
+            ((LostItem) item).setTimeLost(date);
+        } else if(item instanceof FoundItem) {
+            ((FoundItem) item).setTimeFound(date);
+        }
     }
 
     private void showItemLocationActivity(Item item) {

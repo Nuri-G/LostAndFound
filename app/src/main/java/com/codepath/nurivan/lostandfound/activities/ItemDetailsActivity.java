@@ -2,6 +2,7 @@ package com.codepath.nurivan.lostandfound.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -41,5 +42,12 @@ public class ItemDetailsActivity extends AppCompatActivity {
 
         binding.tvItemNameDetails.setText(item.getItemName());
         binding.tvItemLocation.setText(item.getItemLocation().toString());
+
+        binding.bEditItem.setOnClickListener(v -> {
+            Intent i = new Intent(this, ItemNameActivity.class);
+            i.putExtra(Item.class.getSimpleName(), item);
+
+            startActivity(i);
+        });
     }
 }

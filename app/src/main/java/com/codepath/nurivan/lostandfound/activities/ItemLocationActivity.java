@@ -14,6 +14,8 @@ import com.codepath.nurivan.lostandfound.models.Item;
 import com.codepath.nurivan.lostandfound.models.LostItem;
 import com.parse.ParseGeoPoint;
 
+import java.util.Locale;
+
 public class ItemLocationActivity extends AppCompatActivity {
     public static final String TAG = "ItemLocationActivity";
     private static final String LOST_QUESTION = "Where did you lose it?";
@@ -40,6 +42,11 @@ public class ItemLocationActivity extends AppCompatActivity {
         } else if(item instanceof FoundItem) {
             binding.tvLocation.setText(FOUND_QUESTION);
             binding.bFind.setText(FOUND_BUTTON);
+        }
+
+        if(item.getItemLocation() != null) {
+            binding.etLatitude.setText(String.format(Locale.US, "%f", item.getItemLocation().getLatitude()));
+            binding.etLongitude.setText(String.format(Locale.US, "%f", item.getItemLocation().getLongitude()));
         }
 
 

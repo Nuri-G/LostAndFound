@@ -38,6 +38,10 @@ public class ItemNameActivity extends AppCompatActivity {
             binding.tvName.setText(FOUND_QUESTION);
         }
 
+        if(item.getItemName() != null && item.getItemName().length() > 0) {
+            binding.etItemName.setText(item.getItemName());
+        }
+
         binding.bToTime.setOnClickListener(v -> {
             String name = binding.etItemName.getText().toString();
             name = name.trim();

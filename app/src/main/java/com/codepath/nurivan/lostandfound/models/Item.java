@@ -6,7 +6,7 @@ import com.parse.ParseUser;
 
 import org.json.JSONArray;
 
-public class Item extends ParseObject {
+public abstract class Item extends ParseObject {
     public static final String KEY_ITEM_NAME = "itemName";
     public static final String KEY_ITEM_LOCATION = "itemLocation";
     public static final String KEY_MATCHES = "matches";
