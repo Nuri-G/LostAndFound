@@ -5,13 +5,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
-import com.codepath.nurivan.lostandfound.databinding.ActivityItemDescriptionBinding;
 import com.codepath.nurivan.lostandfound.databinding.ActivityItemDetailsBinding;
 import com.codepath.nurivan.lostandfound.models.FoundItem;
 import com.codepath.nurivan.lostandfound.models.Item;
 import com.codepath.nurivan.lostandfound.models.LostItem;
 
 public class ItemDetailsActivity extends AppCompatActivity {
+    private static final String LOST_DATE_LABEL = "Lost On:";
+    private static final String FOUND_DATE_LABEL = "Found On:";
 
     ActivityItemDetailsBinding binding;
 
@@ -30,10 +31,12 @@ public class ItemDetailsActivity extends AppCompatActivity {
             LostItem lostItem = (LostItem) item;
 
             binding.tvItemDate.setText(lostItem.getTimeLost().toString());
+            binding.tvItemDateLabel.setText(LOST_DATE_LABEL);
         } else if(item instanceof FoundItem) {
             FoundItem foundItem = (FoundItem) item;
 
             binding.tvItemDate.setText(foundItem.getTimeFound().toString());
+            binding.tvItemDateLabel.setText(FOUND_DATE_LABEL);
         }
 
         binding.tvItemNameDetails.setText(item.getItemName());
