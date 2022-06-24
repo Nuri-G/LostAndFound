@@ -4,117 +4,66 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.ItemDescriptionActivity">
+    tools:context=".activities.ItemDetailsActivity">
 
     <TextView
-        android:id="@+id/tvDescription"
+        android:id="@+id/tvMatchesLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
-        android:text="@string/how_would_you_describe_it"
-        android:textSize="25sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/matches_for"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/tvCategory"
+        android:id="@+id/tvItemNameDetails"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
-        android:text="@string/category"
-        android:textSize="25sp"
+        android:layout_marginTop="4dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvDescription" />
-
-    <Spinner
-        android:id="@+id/sCategories"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="28dp"
-        android:contentDescription="@string/category_spinner"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.36"
-        app:layout_constraintStart_toEndOf="@+id/tvCategory"
-        app:layout_constraintTop_toBottomOf="@+id/tvDescription" />
+        app:layout_constraintTop_toBottomOf="@+id/tvMatchesLabel"
+        tools:text="Pet Rock" />
 
     <TextView
-        android:id="@+id/tvColor"
+        android:id="@+id/tvItemDateLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
-        android:text="@string/color"
-        android:textSize="25sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sCategories" />
-
-    <Spinner
-        android:id="@+id/sColors"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="28dp"
-        android:contentDescription="@string/color_spinner"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.36"
-        app:layout_constraintStart_toEndOf="@+id/tvColor"
-        app:layout_constraintTop_toBottomOf="@+id/sCategories" />
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="4dp"
+        app:layout_constraintEnd_toStartOf="@+id/tvItemDate"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Lost On:" />
 
     <TextView
-        android:id="@+id/tvPattern"
+        android:id="@+id/tvItemLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
-        android:text="@string/pattern"
-        android:textSize="25sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sColors" />
-
-    <Spinner
-        android:id="@+id/sPatterns"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="28dp"
-        android:contentDescription="@string/color_spinner"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="32dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.36"
-        app:layout_constraintStart_toEndOf="@+id/tvPattern"
-        app:layout_constraintTop_toBottomOf="@+id/sColors" />
-
-    <TextView
-        android:id="@+id/tvSize"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
-        android:text="@string/size"
-        android:textSize="25sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sPatterns" />
-
-    <Spinner
-        android:id="@+id/sSizes"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="28dp"
-        android:contentDescription="@string/color_spinner"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.36"
-        app:layout_constraintStart_toEndOf="@+id/tvSize"
-        app:layout_constraintTop_toBottomOf="@+id/sPatterns" />
+        app:layout_constraintTop_toBottomOf="@+id/tvItemDateLabel"
+        tools:text="Menlo Park, CA" />
 
     <Button
-        android:id="@+id/bFindOwner"
+        android:id="@+id/bEditItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="72dp"
-        android:text="@string/find_the_owner"
+        android:layout_marginTop="16dp"
+        android:text="@string/edit_details"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sSizes" />
+        app:layout_constraintTop_toBottomOf="@+id/tvItemNameDetails" />
 
+    <TextView
+        android:id="@+id/tvItemDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="3/7/2022" />
 </androidx.constraintlayout.widget.ConstraintLayout>

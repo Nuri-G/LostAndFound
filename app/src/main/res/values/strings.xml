@@ -34,4 +34,6 @@
     <string name="pattern">Pattern:</string>
     <string name="matched">Matched</string>
     <string name="todo">TODO</string>
+    <string name="matches_for">Matches For:</string>
+    <string name="edit_details">Edit Details</string>
 </resources>

@@ -10,20 +10,20 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.codepath.nurivan.lostandfound.R;
-import com.codepath.nurivan.lostandfound.databinding.ActivityItemDetailsBinding;
+import com.codepath.nurivan.lostandfound.databinding.ActivityItemDescriptionBinding;
 import com.codepath.nurivan.lostandfound.models.FoundItem;
 
 public class ItemDescriptionActivity extends AppCompatActivity {
-    public static final String TAG = "ItemDetailsActivity";
+    public static final String TAG = "ItemDescriptionActivity";
 
-    ActivityItemDetailsBinding binding;
+    ActivityItemDescriptionBinding binding;
     FoundItem item;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivityItemDetailsBinding.inflate(getLayoutInflater());
+        binding = ActivityItemDescriptionBinding.inflate(getLayoutInflater());
 
         View view = binding.getRoot();
         setContentView(view);
