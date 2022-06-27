@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.util.Log;
@@ -54,6 +55,9 @@ public class FoundFragment extends Fragment {
 
         adapter = new ItemAdapter(getContext(), items);
         binding.rvFoundItems.setAdapter(adapter);
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemAdapter.SwipeHelper(adapter));
+        itemTouchHelper.attachToRecyclerView(binding.rvFoundItems);
     }
 
     @Override

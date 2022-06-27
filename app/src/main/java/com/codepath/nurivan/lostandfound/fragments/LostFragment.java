@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.util.Log;
@@ -15,7 +16,6 @@ import android.view.ViewGroup;
 import com.codepath.nurivan.lostandfound.activities.ItemNameActivity;
 import com.codepath.nurivan.lostandfound.adapters.ItemAdapter;
 import com.codepath.nurivan.lostandfound.databinding.FragmentLostBinding;
-import com.codepath.nurivan.lostandfound.models.FoundItem;
 import com.codepath.nurivan.lostandfound.models.Item;
 import com.codepath.nurivan.lostandfound.models.LostItem;
 import com.parse.ParseQuery;
@@ -55,6 +55,9 @@ public class LostFragment extends Fragment {
 
         adapter = new ItemAdapter(getContext(), items);
         binding.rvLostItems.setAdapter(adapter);
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemAdapter.SwipeHelper(adapter));
+        itemTouchHelper.attachToRecyclerView(binding.rvLostItems);
     }
 
     @Override

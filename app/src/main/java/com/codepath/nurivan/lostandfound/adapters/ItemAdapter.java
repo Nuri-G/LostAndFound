@@ -2,11 +2,13 @@ package com.codepath.nurivan.lostandfound.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.codepath.nurivan.lostandfound.activities.ItemDetailsActivity;
@@ -19,8 +21,9 @@ import java.util.Date;
 import java.util.List;
 
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
-    Context context;
-    List<Item> items;
+    public static final String TAG = "ItemAdapter";
+    private final Context context;
+    private final List<Item> items;
 
     public ItemAdapter(Context context, List<Item> items) {
         this.context = context;
@@ -40,14 +43,26 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         holder.bind(item);
     }
 
+    private void deleteItem(int index) {
+        Item item = items.get(index);
+        item.deleteInBackground(e -> {
+            if(e != null) {
+                Log.e(TAG, "Failed to delete item", e);
+            }
+        });
+        items.remove(index);
+        notifyItemRemoved(index);
+    }
+
     @Override
     public int getItemCount() {
         return items.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        ItemLayoutBinding binding;
-        Item item;
+        private final ItemLayoutBinding binding;
+        private Item item;
+
         public ViewHolder(ItemLayoutBinding binding) {
             super(binding.getRoot());
 
@@ -67,13 +82,17 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
 
             Date date = new Date();
 
-            if(item instanceof LostItem) {
+            if (item instanceof LostItem) {
                 date.setTime(((LostItem) item).getTimeLost().getTime());
-            } else if(item instanceof FoundItem) {
+            } else if (item instanceof FoundItem) {
                 date.setTime(((FoundItem) item).getTimeFound().getTime());
             }
             binding.tvDate.setText(date.toString());
             binding.getRoot().setOnClickListener(this);
+        }
+
+        public Item getItem() {
+            return item;
         }
 
         @Override
@@ -82,6 +101,25 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
             i.putExtra(Item.class.getSimpleName(), item);
 
             context.startActivity(i);
+        }
+    }
+
+    public static class SwipeHelper extends ItemTouchHelper.SimpleCallback {
+        private final ItemAdapter adapter;
+        public SwipeHelper(ItemAdapter adapter) {
+            super(0, ItemTouchHelper.LEFT);
+            this.adapter = adapter;
+        }
+
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            int position = viewHolder.getAdapterPosition();
+            adapter.deleteItem(position);
         }
     }
 }
