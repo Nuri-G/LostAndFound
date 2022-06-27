@@ -79,8 +79,8 @@ public class ItemLocationActivity extends AppCompatActivity {
                 if(e != null) {
                     Log.e(TAG, "Failed to save item.", e);
                 }
+                finish();
             });
-            finish();
         } else if(item instanceof FoundItem) {
             showItemDetailsActivity((FoundItem) item);
         }
