@@ -1,6 +1,11 @@
 package com.codepath.nurivan.lostandfound.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.DefaultLifecycleObserver;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.OnLifecycleEvent;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +16,7 @@ import com.codepath.nurivan.lostandfound.databinding.ActivityItemDetailsBinding;
 import com.codepath.nurivan.lostandfound.models.FoundItem;
 import com.codepath.nurivan.lostandfound.models.Item;
 import com.codepath.nurivan.lostandfound.models.LostItem;
+import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
@@ -19,7 +25,7 @@ import org.json.JSONArray;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ItemDetailsActivity extends AppCompatActivity {
+public class ItemDetailsActivity extends AppCompatActivity implements DefaultLifecycleObserver {
     public static final String TAG = "ItemDetailsActivity";
 
     private static final String LOST_DATE_LABEL = "Lost On:";
@@ -39,7 +45,31 @@ public class ItemDetailsActivity extends AppCompatActivity {
 
         item = getIntent().getParcelableExtra(Item.class.getSimpleName());
 
+        getLifecycle().addObserver(this);
+
+        binding.bEditItem.setOnClickListener(v -> {
+            Intent i = new Intent(this, ItemNameActivity.class);
+            i.putExtra(Item.class.getSimpleName(), item);
+
+            startActivity(i);
+        });
+
+        findAndSetMatches();
+    }
+
+    @Override
+    public void onResume(@NonNull LifecycleOwner owner) {
+        updateDetails();
+    }
+
+    private void updateDetails() {
+        try {
+            item.fetch();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         if(item instanceof LostItem) {
+            System.out.println("HERE");
             LostItem lostItem = (LostItem) item;
 
             binding.tvItemDate.setText(lostItem.getTimeLost().toString());
@@ -53,15 +83,6 @@ public class ItemDetailsActivity extends AppCompatActivity {
 
         binding.tvItemNameDetails.setText(item.getItemName());
         binding.tvItemLocation.setText(item.getItemLocation().toString());
-
-        binding.bEditItem.setOnClickListener(v -> {
-            Intent i = new Intent(this, ItemNameActivity.class);
-            i.putExtra(Item.class.getSimpleName(), item);
-
-            startActivity(i);
-        });
-
-        findAndSetMatches();
     }
 
     private void findAndSetMatches() {
