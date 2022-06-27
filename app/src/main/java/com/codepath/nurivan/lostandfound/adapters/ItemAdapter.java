@@ -73,10 +73,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
             this.item = item;
             binding.tvItemName.setText(item.getItemName());
 
-            double latitude = item.getItemLocation().getLatitude();
-            double longitude = item.getItemLocation().getLongitude();
 
-            String coordinates = "(" + latitude + ", " + longitude + ")";
+            String coordinates = Item.formatItemCoordinates(item.getItemLocation());
 
             binding.tvCoordinates.setText(coordinates);
 
@@ -87,7 +85,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
             } else if (item instanceof FoundItem) {
                 date.setTime(((FoundItem) item).getTimeFound().getTime());
             }
-            binding.tvDate.setText(date.toString());
+            binding.tvDate.setText(Item.formatItemDate(date));
             binding.getRoot().setOnClickListener(this);
         }
 

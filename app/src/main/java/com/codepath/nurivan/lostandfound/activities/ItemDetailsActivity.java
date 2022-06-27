@@ -3,9 +3,7 @@ package com.codepath.nurivan.lostandfound.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.DefaultLifecycleObserver;
-import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.OnLifecycleEvent;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -62,27 +60,29 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
         updateDetails();
     }
 
+
+
     private void updateDetails() {
+        //TODO - this fetch slows down the app a lot...
         try {
             item.fetch();
         } catch (ParseException e) {
             e.printStackTrace();
         }
         if(item instanceof LostItem) {
-            System.out.println("HERE");
             LostItem lostItem = (LostItem) item;
 
-            binding.tvItemDate.setText(lostItem.getTimeLost().toString());
+            binding.tvItemDate.setText(Item.formatItemDate(lostItem.getTimeLost()));
             binding.tvItemDateLabel.setText(LOST_DATE_LABEL);
         } else if(item instanceof FoundItem) {
             FoundItem foundItem = (FoundItem) item;
 
-            binding.tvItemDate.setText(foundItem.getTimeFound().toString());
+            binding.tvItemDate.setText(Item.formatItemDate(foundItem.getTimeFound()));
             binding.tvItemDateLabel.setText(FOUND_DATE_LABEL);
         }
 
         binding.tvItemNameDetails.setText(item.getItemName());
-        binding.tvItemLocation.setText(item.getItemLocation().toString());
+        binding.tvItemLocation.setText(Item.formatItemCoordinates(item.getItemLocation()));
     }
 
     private void findAndSetMatches() {
@@ -100,7 +100,7 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
                     return;
                 }
                 otherItems.addAll(objects);
-                setMatches(item, otherItems);
+                setPossibleMatches(item, otherItems);
             });
         } else if(item instanceof FoundItem) {
             ParseQuery<LostItem> query = ParseQuery.getQuery(LostItem.class);
@@ -112,26 +112,26 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
                     return;
                 }
                 otherItems.addAll(objects);
-                setMatches(item, otherItems);
+                setPossibleMatches(item, otherItems);
             });
         }
 
 
     }
 
-    private void setMatches(Item item, List<Item> otherItems) {
-        JSONArray matches = item.getMatches();
+    private void setPossibleMatches(Item item, List<Item> otherItems) {
+        JSONArray matches = item.getPossibleMatches();
         for(Item other : otherItems) {
             double matchAmount = item.checkItemMatch(other);
 
-            Log.i(TAG, "Match amount: " + matchAmount + ", Item: " + item.getItemName() + ", Other: " + other.getItemName());
+            Log.i(TAG, "Match amount: " + matchAmount + ", Item: " + item.getItemName() + ", Other Item: " + other.getItemName());
 
             if(matchAmount >= 0.7) {
                 matches.put(other.getObjectId());
             }
         }
 
-        item.setMatches(matches);
+        item.setPossibleMatches(matches);
         item.saveInBackground(e -> {
             if(e != null) {
                 Log.e(TAG, "Failed to save matches.", e);

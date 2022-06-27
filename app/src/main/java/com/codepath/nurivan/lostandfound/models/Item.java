@@ -7,12 +7,14 @@ import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.json.JSONArray;
 
 import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
 import java.util.Date;
 
 public abstract class Item extends ParseObject {
     public static final String KEY_ITEM_NAME = "itemName";
     public static final String KEY_ITEM_LOCATION = "itemLocation";
-    public static final String KEY_MATCHES = "matches";
+    public static final String KEY_POSSIBLE_MATCHES = "possibleMatches";
+    public static final String KEY_CONFIRMED_MATCH = "confirmedMatches";
 
     public String getItemName() {
         return getString(KEY_ITEM_NAME);
@@ -29,23 +31,20 @@ public abstract class Item extends ParseObject {
         put(KEY_ITEM_LOCATION, itemLocation);
     }
 
-    public void setMatches(JSONArray matches) {
-        put(KEY_MATCHES, matches);
+    public void setPossibleMatches(JSONArray matches) {
+        put(KEY_POSSIBLE_MATCHES, matches);
     }
 
-    public JSONArray getMatches() {
-        return getJSONArray(KEY_MATCHES);
+    public JSONArray getPossibleMatches() {
+        return getJSONArray(KEY_POSSIBLE_MATCHES);
     }
 
-    public void addMatch(String itemId) {
-        JSONArray matches = getMatches();
-        matches.put(itemId);
-
-        put(KEY_MATCHES, matches);
+    public Item getConfirmedMatch() {
+        return (Item) getParseObject(KEY_CONFIRMED_MATCH);
     }
 
     //Returns value from 0 to 1 depending on how close to 0 the distance is.
-    private double getLocationSimilarity(Item other) {
+    private double locationSimilarity(Item other) {
         final double MAX_DISTANCE = 50.0;
         double distanceMiles = getItemLocation().distanceInMilesTo(other.getItemLocation());
 
@@ -56,9 +55,9 @@ public abstract class Item extends ParseObject {
         }
     }
 
-    private double getNameSimilarity(Item other) {
-        String itemName = getItemName();
-        String otherName = other.getItemName();
+    private double nameSimilarity(Item other) {
+        String itemName = getItemName().toLowerCase();
+        String otherName = other.getItemName().toLowerCase();
         int longerLength = Math.max(itemName.length(), otherName.length());
         LevenshteinDistance nameSimilarity = new LevenshteinDistance();
 
@@ -67,7 +66,7 @@ public abstract class Item extends ParseObject {
         return (longerLength - similarity) / (double) longerLength;
     }
 
-    private double getTimeSimilarity(Item other) {
+    private double timeSimilarity(Item other) {
         LostItem lostItem;
         FoundItem foundItem;
         if(this instanceof LostItem) {
@@ -97,13 +96,26 @@ public abstract class Item extends ParseObject {
         final double LOCATION_SIMILARITY_WEIGHT = 0.3;
         final double TIME_SIMILARITY_WEIGHT = 0.3;
 
-        double nameSimilarity = getNameSimilarity(other);
-        double locationSimilarity = getLocationSimilarity(other);
-        double timeSimilarity = getTimeSimilarity(other);
+        double nameSimilarity = nameSimilarity(other);
+        double locationSimilarity = locationSimilarity(other);
+        double timeSimilarity = timeSimilarity(other);
 
 
         return NAME_SIMILARITY_WEIGHT * nameSimilarity + LOCATION_SIMILARITY_WEIGHT * locationSimilarity + TIME_SIMILARITY_WEIGHT * timeSimilarity;
     }
 
+    public static String formatItemDate(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
 
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int year = calendar.get(Calendar.YEAR);
+
+        return month + "/" + day + "/" + year;
+    }
+
+    public static String formatItemCoordinates(ParseGeoPoint point) {
+        return "(" + point.getLatitude() + ", " + point.getLongitude() + ")";
+    }
 }
