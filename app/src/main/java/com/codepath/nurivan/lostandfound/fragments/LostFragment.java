@@ -58,6 +58,8 @@ public class LostFragment extends Fragment {
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemAdapter.SwipeHelper(adapter));
         itemTouchHelper.attachToRecyclerView(binding.rvLostItems);
+
+        binding.swipeRefreshLost.setOnRefreshListener(this::getLostItems);
     }
 
     @Override
@@ -82,11 +84,11 @@ public class LostFragment extends Fragment {
     }
 
     private void getLostItems() {
+        binding.swipeRefreshLost.setRefreshing(true);
         items.clear();
         ParseQuery<LostItem> query = ParseQuery.getQuery(LostItem.class);
         query.whereEqualTo(LostItem.KEY_LOST_BY, ParseUser.getCurrentUser());
         query.setLimit(20);
-        binding.pbLostItems.setVisibility(View.VISIBLE);
         query.findInBackground((objects, e) -> {
             if(e != null) {
                 Log.e(TAG, "Error getting lost items", e);
@@ -94,7 +96,7 @@ public class LostFragment extends Fragment {
             }
             items.addAll(objects);
             adapter.notifyDataSetChanged();
-            binding.pbLostItems.setVisibility(View.GONE);
+            binding.swipeRefreshLost.setRefreshing(false);
         });
     }
 }

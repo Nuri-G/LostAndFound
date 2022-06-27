@@ -58,6 +58,8 @@ public class FoundFragment extends Fragment {
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemAdapter.SwipeHelper(adapter));
         itemTouchHelper.attachToRecyclerView(binding.rvFoundItems);
+
+        binding.swipeRefreshFound.setOnRefreshListener(this::getFoundItems);
     }
 
     @Override
@@ -82,11 +84,11 @@ public class FoundFragment extends Fragment {
     }
 
     private void getFoundItems() {
+        binding.swipeRefreshFound.setRefreshing(true);
         items.clear();
         ParseQuery<FoundItem> query = ParseQuery.getQuery(FoundItem.class);
         query.whereEqualTo(FoundItem.KEY_FOUND_BY, ParseUser.getCurrentUser());
         query.setLimit(20);
-        binding.pbFoundItems.setVisibility(View.VISIBLE);
         query.findInBackground((objects, e) -> {
             if(e != null) {
                 Log.e(TAG, "Error getting found items", e);
@@ -94,7 +96,7 @@ public class FoundFragment extends Fragment {
             }
             items.addAll(objects);
             adapter.notifyDataSetChanged();
-            binding.pbFoundItems.setVisibility(View.GONE);
+            binding.swipeRefreshFound.setRefreshing(false);
         });
     }
 }
