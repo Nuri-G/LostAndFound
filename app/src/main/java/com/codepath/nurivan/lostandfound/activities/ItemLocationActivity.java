@@ -57,10 +57,10 @@ public class ItemLocationActivity extends AppCompatActivity {
         });
     }
 
-    private void updateItem(Item item, String latitudeString, String longitudeString) {
+    private ParseGeoPoint createGeoPoint(String latitudeString, String longitudeString) {
         if(latitudeString.length() == 0 || longitudeString.length() == 0) {
             Toast.makeText(this, "Please enter a value for latitude and longitude.", Toast.LENGTH_SHORT).show();
-            return;
+            return null;
         }
 
         double latitude = Double.parseDouble(latitudeString);
@@ -68,12 +68,18 @@ public class ItemLocationActivity extends AppCompatActivity {
 
         if(latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
             Toast.makeText(this, "Please enter valid coordinates.", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+        return new ParseGeoPoint(latitude, longitude);
+    }
+
+    private void updateItem(Item item, String latitudeString, String longitudeString) {
+        ParseGeoPoint parseGeoPoint = createGeoPoint(latitudeString, longitudeString);
+        if(parseGeoPoint == null) {
             return;
         }
 
-        ParseGeoPoint parseGeoPoint = new ParseGeoPoint(latitude, longitude);
         item.setItemLocation(parseGeoPoint);
-
         if(item instanceof LostItem) {
             item.saveInBackground(e -> {
                 if(e != null) {
