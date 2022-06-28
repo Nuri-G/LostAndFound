@@ -78,7 +78,13 @@ public class ItemLocationActivity extends AppCompatActivity {
             item.saveInBackground(e -> {
                 if(e != null) {
                     Log.e(TAG, "Failed to save item.", e);
+                    Toast.makeText(this, "Failed to save item.", Toast.LENGTH_SHORT).show();
+                    finish();
                 }
+
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.putExtra(LostItem.class.getSimpleName(), item);
+                startActivity(intent);
                 finish();
             });
         } else if(item instanceof FoundItem) {

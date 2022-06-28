@@ -2,12 +2,14 @@ package com.codepath.nurivan.lostandfound.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.codepath.nurivan.lostandfound.R;
 import com.codepath.nurivan.lostandfound.databinding.ActivityItemDescriptionBinding;
@@ -39,7 +41,12 @@ public class ItemDescriptionActivity extends AppCompatActivity {
         binding.bFindOwner.setOnClickListener(v -> item.saveInBackground(e -> {
             if(e != null) {
                 Log.e(TAG, "Failed to save FoundItem", e);
+                Toast.makeText(this, "Failed to save item.", Toast.LENGTH_SHORT).show();
+                finish();
             }
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra(FoundItem.class.getSimpleName(), item);
+            startActivity(intent);
             finish();
         }));
     }

@@ -27,10 +27,10 @@ import java.util.List;
 public class FoundFragment extends Fragment {
     public static final String TAG = "FoundFragment";
 
-    private FragmentFoundBinding binding;
+    private static final List<Item> items = new ArrayList<>();
 
+    private FragmentFoundBinding binding;
     private ItemAdapter adapter;
-    private List<Item> items;
 
     public FoundFragment() {
         // Required empty public constructor
@@ -39,7 +39,6 @@ public class FoundFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        items = new ArrayList<>();
         adapter = new ItemAdapter(getContext(), items);
     }
 
@@ -60,13 +59,14 @@ public class FoundFragment extends Fragment {
         itemTouchHelper.attachToRecyclerView(binding.rvFoundItems);
 
         binding.swipeRefreshFound.setOnRefreshListener(this::getFoundItems);
+        if(items.isEmpty()) {
+            getFoundItems();
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
-        getFoundItems();
     }
 
     @Override
@@ -98,5 +98,17 @@ public class FoundFragment extends Fragment {
             adapter.notifyDataSetChanged();
             binding.swipeRefreshFound.setRefreshing(false);
         });
+    }
+
+    public void addFoundItem(FoundItem item) {
+        for(int i = 0; i < items.size(); i++) {
+            if(items.get(i).getObjectId().equals(item.getObjectId())) {
+                items.set(i, item);
+                adapter.notifyItemChanged(i);
+                return;
+            }
+        }
+        items.add(item);
+        adapter.notifyItemInserted(items.size() - 1);
     }
 }

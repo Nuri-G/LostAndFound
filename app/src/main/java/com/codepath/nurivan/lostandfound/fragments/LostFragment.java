@@ -27,10 +27,10 @@ import java.util.List;
 public class LostFragment extends Fragment {
     public static final String TAG = "LostFragment";
 
-    private FragmentLostBinding binding;
+    private static final List<Item> items = new ArrayList<>();
 
+    private FragmentLostBinding binding;
     private ItemAdapter adapter;
-    private List<Item> items;
 
     public LostFragment() {
         // Required empty public constructor
@@ -39,7 +39,6 @@ public class LostFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        items = new ArrayList<>();
         adapter = new ItemAdapter(getContext(), items);
     }
 
@@ -60,12 +59,14 @@ public class LostFragment extends Fragment {
         itemTouchHelper.attachToRecyclerView(binding.rvLostItems);
 
         binding.swipeRefreshLost.setOnRefreshListener(this::getLostItems);
+        if(items.isEmpty()) {
+            getLostItems();
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        getLostItems();
     }
 
     @Override
@@ -97,5 +98,17 @@ public class LostFragment extends Fragment {
             adapter.notifyDataSetChanged();
             binding.swipeRefreshLost.setRefreshing(false);
         });
+    }
+
+    public void addLostItem(LostItem item) {
+        for(int i = 0; i < items.size(); i++) {
+            if(items.get(i).getObjectId().equals(item.getObjectId())) {
+                items.set(i, item);
+                adapter.notifyItemChanged(i);
+                return;
+            }
+        }
+        items.add(item);
+        adapter.notifyItemInserted(items.size() - 1);
     }
 }
