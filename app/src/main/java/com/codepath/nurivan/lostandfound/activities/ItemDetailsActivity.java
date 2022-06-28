@@ -63,12 +63,6 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
 
 
     private void updateDetails() {
-        //TODO - this fetch slows down the app a lot...
-        try {
-            item.fetch();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
         if(item instanceof LostItem) {
             LostItem lostItem = (LostItem) item;
 
