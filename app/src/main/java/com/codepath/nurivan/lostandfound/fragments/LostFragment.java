@@ -28,6 +28,7 @@ public class LostFragment extends Fragment {
     public static final String TAG = "LostFragment";
 
     private FragmentLostBinding binding;
+
     private ItemAdapter adapter;
     private List<Item> items;
 
@@ -39,6 +40,7 @@ public class LostFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         items = new ArrayList<>();
+        adapter = new ItemAdapter(getContext(), items);
     }
 
     @Override
@@ -52,8 +54,6 @@ public class LostFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         binding.bAdd.setOnClickListener(v -> showItemNameActivity());
         binding.rvLostItems.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        adapter = new ItemAdapter(getContext(), items);
         binding.rvLostItems.setAdapter(adapter);
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemAdapter.SwipeHelper(adapter));
@@ -65,7 +65,6 @@ public class LostFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
         getLostItems();
     }
 
