@@ -14,14 +14,10 @@ import com.codepath.nurivan.lostandfound.databinding.ActivityItemDetailsBinding;
 import com.codepath.nurivan.lostandfound.models.FoundItem;
 import com.codepath.nurivan.lostandfound.models.Item;
 import com.codepath.nurivan.lostandfound.models.LostItem;
-import com.parse.ParseException;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
+import com.parse.FunctionCallback;
+import com.parse.ParseCloud;
 
-import org.json.JSONArray;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 public class ItemDetailsActivity extends AppCompatActivity implements DefaultLifecycleObserver {
     public static final String TAG = "ItemDetailsActivity";
@@ -52,7 +48,7 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
             startActivity(i);
         });
 
-        findAndSetMatches();
+        setPossibleMatches(item);
     }
 
     @Override
@@ -79,57 +75,15 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
         binding.tvItemLocation.setText(Item.formatItemCoordinates(item.getItemLocation()));
     }
 
-    private void findAndSetMatches() {
-        List<Item> otherItems = new ArrayList<>();
-
-        final int QUERY_LIMIT = 20;
-
+    private void setPossibleMatches(Item item) {
         if(item instanceof LostItem) {
-            ParseQuery<FoundItem> query = ParseQuery.getQuery(FoundItem.class);
-            query.whereNotEqualTo(FoundItem.KEY_FOUND_BY, ParseUser.getCurrentUser());
-            query.setLimit(QUERY_LIMIT);
-            query.findInBackground((objects, e) -> {
+            HashMap<String, Object> params = new HashMap<>();
+            params.put("lostItemId", item.getObjectId());
+            ParseCloud.callFunctionInBackground("updateMatches", params, (FunctionCallback<Float>) (object, e) -> {
                 if(e != null) {
-                    Log.e(TAG, "Error getting lost items", e);
-                    return;
+                    Log.e(TAG, "Failed to set matches: ", e);
                 }
-                otherItems.addAll(objects);
-                setPossibleMatches(item, otherItems);
-            });
-        } else if(item instanceof FoundItem) {
-            ParseQuery<LostItem> query = ParseQuery.getQuery(LostItem.class);
-            query.whereNotEqualTo(LostItem.KEY_LOST_BY, ParseUser.getCurrentUser());
-            query.setLimit(QUERY_LIMIT);
-            query.findInBackground((objects, e) -> {
-                if(e != null) {
-                    Log.e(TAG, "Error getting lost items", e);
-                    return;
-                }
-                otherItems.addAll(objects);
-                setPossibleMatches(item, otherItems);
             });
         }
-
-
-    }
-
-    private void setPossibleMatches(Item item, List<Item> otherItems) {
-        JSONArray matches = item.getPossibleMatches();
-        for(Item other : otherItems) {
-            double matchAmount = item.checkItemMatch(other);
-
-            Log.i(TAG, "Match amount: " + matchAmount + ", Item: " + item.getItemName() + ", Other Item: " + other.getItemName());
-
-            if(matchAmount >= 0.7) {
-                matches.put(other.getObjectId());
-            }
-        }
-
-        item.setPossibleMatches(matches);
-        item.saveInBackground(e -> {
-            if(e != null) {
-                Log.e(TAG, "Failed to save matches.", e);
-            }
-        });
     }
 }
