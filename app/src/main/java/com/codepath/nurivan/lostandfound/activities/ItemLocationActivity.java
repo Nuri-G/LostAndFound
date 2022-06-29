@@ -93,6 +93,7 @@ public class ItemLocationActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             });
+            item.setPossibleMatches();
         } else if(item instanceof FoundItem) {
             showItemDetailsActivity((FoundItem) item);
         }

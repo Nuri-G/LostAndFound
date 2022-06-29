@@ -1,5 +1,9 @@
 package com.codepath.nurivan.lostandfound.models;
 
+import android.util.Log;
+
+import com.parse.FunctionCallback;
+import com.parse.ParseCloud;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 
@@ -7,8 +11,11 @@ import org.json.JSONArray;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 
 public abstract class Item extends ParseObject {
+    public static final String TAG = "Item";
+
     public static final String KEY_ITEM_NAME = "itemName";
     public static final String KEY_ITEM_LOCATION = "itemLocation";
     public static final String KEY_POSSIBLE_MATCHES = "possibleMatches";
@@ -54,5 +61,19 @@ public abstract class Item extends ParseObject {
 
     public static String formatItemCoordinates(ParseGeoPoint point) {
         return "(" + point.getLatitude() + ", " + point.getLongitude() + ")";
+    }
+
+    public void setPossibleMatches() {
+        HashMap<String, Object> params = new HashMap<>();
+        if(this instanceof LostItem) {
+            params.put("lostItemId", getObjectId());
+        } else if(this instanceof FoundItem) {
+            params.put("foundItemId", getObjectId());
+        }
+        ParseCloud.callFunctionInBackground("updateMatches", params, (FunctionCallback<Float>) (object, e) -> {
+            if(e != null) {
+                Log.e(TAG, "Failed to set matches: ", e);
+            }
+        });
     }
 }

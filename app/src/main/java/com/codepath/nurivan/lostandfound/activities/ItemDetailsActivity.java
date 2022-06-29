@@ -47,8 +47,6 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
 
             startActivity(i);
         });
-
-        setPossibleMatches(item);
     }
 
     @Override
@@ -73,17 +71,5 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
 
         binding.tvItemNameDetails.setText(item.getItemName());
         binding.tvItemLocation.setText(Item.formatItemCoordinates(item.getItemLocation()));
-    }
-
-    private void setPossibleMatches(Item item) {
-        if(item instanceof LostItem) {
-            HashMap<String, Object> params = new HashMap<>();
-            params.put("lostItemId", item.getObjectId());
-            ParseCloud.callFunctionInBackground("updateMatches", params, (FunctionCallback<Float>) (object, e) -> {
-                if(e != null) {
-                    Log.e(TAG, "Failed to set matches: ", e);
-                }
-            });
-        }
     }
 }
