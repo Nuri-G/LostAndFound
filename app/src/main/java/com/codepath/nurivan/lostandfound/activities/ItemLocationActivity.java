@@ -88,12 +88,13 @@ public class ItemLocationActivity extends AppCompatActivity {
                     finish();
                 }
 
+                item.setPossibleMatches();
+
                 Intent intent = new Intent(this, MainActivity.class);
                 intent.putExtra(LostItem.class.getSimpleName(), item);
                 startActivity(intent);
                 finish();
             });
-            item.setPossibleMatches();
         } else if(item instanceof FoundItem) {
             showItemDetailsActivity((FoundItem) item);
         }

@@ -38,20 +38,20 @@ public class ItemDescriptionActivity extends AppCompatActivity {
         setUpSpinner(R.array.sizes_array, "size", binding.sSizes);
 
 
-        binding.bFindOwner.setOnClickListener(v -> {
-            item.saveInBackground(e -> {
-                if(e != null) {
-                    Log.e(TAG, "Failed to save FoundItem", e);
-                    Toast.makeText(this, "Failed to save item.", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-                Intent intent = new Intent(this, MainActivity.class);
-                intent.putExtra(FoundItem.class.getSimpleName(), item);
-                startActivity(intent);
+        binding.bFindOwner.setOnClickListener(v -> item.saveInBackground(e -> {
+            if(e != null) {
+                Log.e(TAG, "Failed to save FoundItem", e);
+                Toast.makeText(this, "Failed to save item.", Toast.LENGTH_SHORT).show();
                 finish();
-            });
+            }
+
             item.setPossibleMatches();
-        });
+
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra(FoundItem.class.getSimpleName(), item);
+            startActivity(intent);
+            finish();
+        }));
     }
 
     private void setUpSpinner(int arrayId, String spinnerType, Spinner spinner) {
