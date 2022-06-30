@@ -87,6 +87,12 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
             }
             binding.tvDate.setText(Item.formatItemDate(date));
             binding.getRoot().setOnClickListener(this);
+
+            if(item.getPossibleMatches().length() > 0) {
+                binding.ivMatched.setImageResource(android.R.drawable.presence_online);
+            } else {
+                binding.ivMatched.setImageResource(android.R.drawable.presence_offline);
+            }
         }
 
         public Item getItem() {
