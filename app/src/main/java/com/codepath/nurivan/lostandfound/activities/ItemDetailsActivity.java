@@ -4,20 +4,17 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
+import com.codepath.nurivan.lostandfound.adapters.MatchAdapter;
 import com.codepath.nurivan.lostandfound.databinding.ActivityItemDetailsBinding;
 import com.codepath.nurivan.lostandfound.models.FoundItem;
 import com.codepath.nurivan.lostandfound.models.Item;
 import com.codepath.nurivan.lostandfound.models.LostItem;
-import com.parse.FunctionCallback;
-import com.parse.ParseCloud;
-
-import java.util.HashMap;
 
 public class ItemDetailsActivity extends AppCompatActivity implements DefaultLifecycleObserver {
     public static final String TAG = "ItemDetailsActivity";
@@ -26,6 +23,7 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
     private static final String FOUND_DATE_LABEL = "Found On:";
 
     ActivityItemDetailsBinding binding;
+    private MatchAdapter adapter;
     private Item item;
 
     @Override
@@ -47,6 +45,10 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
 
             startActivity(i);
         });
+
+        adapter = new MatchAdapter(this, item);
+        binding.rvMatches.setLayoutManager(new LinearLayoutManager(this));
+        binding.rvMatches.setAdapter(adapter);
     }
 
     @Override
@@ -71,5 +73,6 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
 
         binding.tvItemNameDetails.setText(item.getItemName());
         binding.tvItemLocation.setText(Item.formatItemCoordinates(item.getItemLocation()));
+        adapter.loadMatches(item);
     }
 }
