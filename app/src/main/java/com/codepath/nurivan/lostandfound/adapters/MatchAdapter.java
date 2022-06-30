@@ -1,13 +1,17 @@
 package com.codepath.nurivan.lostandfound.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.codepath.nurivan.lostandfound.activities.ItemDetailsActivity;
+import com.codepath.nurivan.lostandfound.activities.OwnershipVerificationActivity;
 import com.codepath.nurivan.lostandfound.databinding.MatchLayoutBinding;
 import com.codepath.nurivan.lostandfound.models.Item;
 import com.codepath.nurivan.lostandfound.models.Match;
@@ -68,7 +72,7 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull MatchAdapter.ViewHolder holder, int position) {
         Match match = matches.get(position);
-        holder.bind(item, match);
+        holder.bind(match);
     }
 
     @Override
@@ -79,21 +83,32 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private final MatchLayoutBinding binding;
 
+        private Match match;
+
         public ViewHolder(MatchLayoutBinding binding) {
             super(binding.getRoot());
 
             this.binding = binding;
         }
 
-        public void bind(Item item, Match match) {
+        public void bind(Match match) {
+            this.match = match;
             double distance = match.getDistanceMiles().doubleValue();
             double score = match.getMatchScore().doubleValue();
 
             String distanceString = String.format(Locale.US,"%.2f mi", distance);
-            String scoreString = String.format(Locale.US, "%.2f%% match.", score * 100);
+            String scoreString = String.format(Locale.US, "%.2f%% match,", score * 100);
 
             binding.tvMatchDistance.setText(distanceString);
             binding.tvMatchScore.setText(scoreString);
+            binding.bVerify.setOnClickListener(v -> showOwnershipVerificationActivity());
+        }
+
+        private void showOwnershipVerificationActivity() {
+            Intent i = new Intent(context, OwnershipVerificationActivity.class);
+            i.putExtra(Match.class.getSimpleName(), match);
+
+            context.startActivity(i);
         }
     }
 }
