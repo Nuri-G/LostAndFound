@@ -4,7 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Toast;
 
@@ -26,14 +28,19 @@ public class SignUpActivity extends AppCompatActivity {
         binding.bSignUp.setOnClickListener(v -> {
             String username = binding.etUsername.getText().toString();
             String password = binding.etPassword.getText().toString();
+            String emailAddress = binding.etEmailAddress.getText().toString();
             String homeAddress = binding.etHomeAddress.getText().toString();
             String confirmedPassword = binding.etConfirmPassword.getText().toString();
 
-            signUpUser(username, homeAddress, password, confirmedPassword);
+            signUpUser(username, emailAddress, homeAddress, password, confirmedPassword);
         });
     }
 
-    private void signUpUser(String username, String homeAddress, String password, String confirmedPassword) {
+    private boolean isValidEmail(String emailAddress) {
+        return !TextUtils.isEmpty(emailAddress) && Patterns.EMAIL_ADDRESS.matcher(emailAddress).matches();
+    }
+
+    private void signUpUser(String username, String emailAddress, String homeAddress, String password, String confirmedPassword) {
 
         if(!confirmedPassword.equals(password)) {
             Toast.makeText(this, "Passwords do not match.", Toast.LENGTH_SHORT).show();
@@ -45,10 +52,16 @@ public class SignUpActivity extends AppCompatActivity {
             return;
         }
 
+        if(!isValidEmail(emailAddress)) {
+            Toast.makeText(this, "Email address is not valid.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         ParseUser.logOut();
         ParseUser user = new ParseUser();
         user.setPassword(password);
         user.setUsername(username);
+        user.setEmail(emailAddress);
 
 
         // TODO - Need to verify that home address is a real place
