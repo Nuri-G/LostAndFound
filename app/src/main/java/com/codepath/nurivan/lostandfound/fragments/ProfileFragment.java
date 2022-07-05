@@ -36,6 +36,7 @@ public class ProfileFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        binding.tvUsername.setText(ParseUser.getCurrentUser().getUsername());
         binding.bLogOut.setOnClickListener(v -> logOutUser());
     }
 
