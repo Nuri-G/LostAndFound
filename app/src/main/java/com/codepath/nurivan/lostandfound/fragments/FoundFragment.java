@@ -28,6 +28,7 @@ public class FoundFragment extends Fragment {
     public static final String TAG = "FoundFragment";
 
     private static final List<Item> items = new ArrayList<>();
+    private static ParseUser lastUser = new ParseUser();
 
     private FragmentFoundBinding binding;
     private ItemAdapter adapter;
@@ -59,14 +60,11 @@ public class FoundFragment extends Fragment {
         itemTouchHelper.attachToRecyclerView(binding.rvFoundItems);
 
         binding.swipeRefreshFound.setOnRefreshListener(this::getFoundItems);
-        if(items.isEmpty()) {
+
+        if(items.isEmpty() || !lastUser.getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
+            lastUser = ParseUser.getCurrentUser();
             getFoundItems();
         }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
     }
 
     @Override

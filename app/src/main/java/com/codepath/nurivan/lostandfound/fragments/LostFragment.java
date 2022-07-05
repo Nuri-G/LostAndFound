@@ -28,6 +28,7 @@ public class LostFragment extends Fragment {
     public static final String TAG = "LostFragment";
 
     private static final List<Item> items = new ArrayList<>();
+    private static ParseUser lastUser = new ParseUser();
 
     private FragmentLostBinding binding;
     private ItemAdapter adapter;
@@ -59,14 +60,10 @@ public class LostFragment extends Fragment {
         itemTouchHelper.attachToRecyclerView(binding.rvLostItems);
 
         binding.swipeRefreshLost.setOnRefreshListener(this::getLostItems);
-        if(items.isEmpty()) {
+        if(items.isEmpty() || !lastUser.getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
+            lastUser = ParseUser.getCurrentUser();
             getLostItems();
         }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
     }
 
     @Override
