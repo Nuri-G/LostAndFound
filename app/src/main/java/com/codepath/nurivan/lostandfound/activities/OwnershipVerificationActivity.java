@@ -1,16 +1,16 @@
 package com.codepath.nurivan.lostandfound.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.codepath.nurivan.lostandfound.R;
 import com.codepath.nurivan.lostandfound.databinding.ActivityOwnershipVerificationBinding;
-import com.codepath.nurivan.lostandfound.models.Item;
 import com.codepath.nurivan.lostandfound.models.Match;
 import com.parse.ParseCloud;
 
@@ -20,7 +20,7 @@ public class OwnershipVerificationActivity extends AppCompatActivity {
 
     private HashMap<String, String> quizAnswers;
     private ActivityOwnershipVerificationBinding binding;
-    private Match match;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,7 +28,7 @@ public class OwnershipVerificationActivity extends AppCompatActivity {
         View view = binding.getRoot();
         setContentView(view);
 
-        match = getIntent().getParcelableExtra(Match.class.getSimpleName());
+        Match match = getIntent().getParcelableExtra(Match.class.getSimpleName());
 
         quizAnswers = new HashMap<>();
         quizAnswers.put("matchId", match.getObjectId());
@@ -39,8 +39,17 @@ public class OwnershipVerificationActivity extends AppCompatActivity {
         setUpSpinner(R.array.sizes_array, "size", binding.sSizes);
 
         binding.bSubmitQuiz.setOnClickListener(v -> {
-            ParseCloud.callFunctionInBackground("submitQuiz", quizAnswers);
-            finish();
+            binding.bSubmitQuiz.setVisibility(View.GONE);
+            binding.pbLoadingResults.setVisibility(View.VISIBLE);
+            ParseCloud.callFunctionInBackground("submitQuiz", quizAnswers, (passed, e) -> {
+                if((Boolean) passed) {
+                    Toast.makeText(getApplicationContext(), "Verification successful.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Verification failed.", Toast.LENGTH_SHORT).show();
+                }
+                binding.pbLoadingResults.setVisibility(View.GONE);
+                finish();
+            });
         });
     }
 

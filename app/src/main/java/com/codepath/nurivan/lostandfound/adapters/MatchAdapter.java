@@ -6,20 +6,24 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.codepath.nurivan.lostandfound.activities.ItemDetailsActivity;
 import com.codepath.nurivan.lostandfound.activities.OwnershipVerificationActivity;
 import com.codepath.nurivan.lostandfound.databinding.MatchLayoutBinding;
+import com.codepath.nurivan.lostandfound.models.FoundItem;
 import com.codepath.nurivan.lostandfound.models.Item;
 import com.codepath.nurivan.lostandfound.models.Match;
+import com.parse.FunctionCallback;
+import com.parse.ParseCloud;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -27,7 +31,7 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
     public static final String TAG = "MatchAdapter";
     private final Context context;
 
-    private List<Match> matches;
+    private final List<Match> matches;
     private Item item;
 
     public MatchAdapter(Context context, Item item) {
@@ -101,7 +105,37 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
 
             binding.tvMatchDistance.setText(distanceString);
             binding.tvMatchScore.setText(scoreString);
-            binding.bVerify.setOnClickListener(v -> showOwnershipVerificationActivity());
+
+            if(match.isVerified()) {
+                binding.bVerify.setVisibility(View.GONE);
+                binding.bEmail.setVisibility(View.VISIBLE);
+                binding.bEmail.setOnClickListener(v -> {
+                    HashMap<String, String> params = new HashMap<>();
+                    params.put("matchId", match.getObjectId());
+                    ParseCloud.callFunctionInBackground("getEmail", params, (FunctionCallback<String>) (emailAddress, e) -> {
+                        if(e != null) {
+                            Toast.makeText(context, "Failed to get email address.", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        showSendEmailActivity(emailAddress);
+                    });
+                });
+            } else if(item instanceof FoundItem) {
+                binding.bVerify.setVisibility(View.GONE);
+                binding.tvVerification.setVisibility(View.VISIBLE);
+            } else {
+                binding.bVerify.setOnClickListener(v -> showOwnershipVerificationActivity());
+            }
+        }
+
+        private void showSendEmailActivity(String emailAddress) {
+            Intent emailIntent = new Intent(Intent.ACTION_SEND);
+            emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{ emailAddress });
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Lost and Found Item");
+            emailIntent.putExtra(Intent.EXTRA_TEXT, "Your message here...");
+
+            emailIntent.setType("message/rfc822");
+            context.startActivity(Intent.createChooser(emailIntent, "Choose an Email client :"));
         }
 
         private void showOwnershipVerificationActivity() {

@@ -43,4 +43,6 @@
     <string name="size_spinner">Size Spinner</string>
     <string name="verify">Verify</string>
     <string name="username_label">Username:</string>
+    <string name="send_email">Send Email</string>
+    <string name="waiting_for_verification">Waiting for verification.</string>
 </resources>
