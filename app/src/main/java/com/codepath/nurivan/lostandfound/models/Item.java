@@ -12,6 +12,7 @@ import org.json.JSONArray;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 
 public abstract class Item extends ParseObject {
     public static final String TAG = "Item";
@@ -60,7 +61,7 @@ public abstract class Item extends ParseObject {
     }
 
     public static String formatItemCoordinates(ParseGeoPoint point) {
-        return "(" + point.getLatitude() + ", " + point.getLongitude() + ")";
+        return "(" + String.format(Locale.US, "%.3f", point.getLatitude()) + ", " + String.format(Locale.US, "%.3f", point.getLongitude()) + ")";
     }
 
     public void setPossibleMatches() {
