@@ -14,9 +14,12 @@ import com.codepath.nurivan.lostandfound.databinding.ActivityItemLocationBinding
 import com.codepath.nurivan.lostandfound.models.FoundItem;
 import com.codepath.nurivan.lostandfound.models.Item;
 import com.codepath.nurivan.lostandfound.models.LostItem;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -105,6 +108,8 @@ public class ItemLocationActivity extends AppCompatActivity implements OnMapRead
         ParseGeoPoint location = item.getItemLocation();
         if(location != null) {
             LatLng point = new LatLng(location.getLatitude(), location.getLongitude());
+            CameraUpdate newPosition = CameraUpdateFactory.newCameraPosition(new CameraPosition(point, 4, 0, 0));
+            map.moveCamera(newPosition);
             onMapClick(point);
         }
     }
