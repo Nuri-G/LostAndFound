@@ -1,40 +1,48 @@
 package com.codepath.nurivan.lostandfound.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.codepath.nurivan.lostandfound.R;
 import com.codepath.nurivan.lostandfound.databinding.ActivityItemLocationBinding;
 import com.codepath.nurivan.lostandfound.models.FoundItem;
 import com.codepath.nurivan.lostandfound.models.Item;
 import com.codepath.nurivan.lostandfound.models.LostItem;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseGeoPoint;
 
-import java.util.Locale;
-
-public class ItemLocationActivity extends AppCompatActivity {
+public class ItemLocationActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener {
     public static final String TAG = "ItemLocationActivity";
     private static final String LOST_QUESTION = "Where did you lose it?";
     private static final String FOUND_QUESTION = "Where did you find it?";
     private static final String LOST_BUTTON = "Find my item!";
     private static final String FOUND_BUTTON = "Next";
 
-    ActivityItemLocationBinding binding;
+    private GoogleMap map;
+    private Marker mapMarker;
+    private Item item;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivityItemLocationBinding.inflate(getLayoutInflater());
+        com.codepath.nurivan.lostandfound.databinding.ActivityItemLocationBinding binding = ActivityItemLocationBinding.inflate(getLayoutInflater());
 
         View view = binding.getRoot();
         setContentView(view);
 
-        Item item = getIntent().getParcelableExtra(Item.class.getSimpleName());
+        item = getIntent().getParcelableExtra(Item.class.getSimpleName());
 
         if(item instanceof LostItem) {
             binding.tvLocation.setText(LOST_QUESTION);
@@ -44,40 +52,23 @@ public class ItemLocationActivity extends AppCompatActivity {
             binding.bFind.setText(FOUND_BUTTON);
         }
 
-        if(item.getItemLocation() != null) {
-            binding.etLatitude.setText(String.format(Locale.US, "%f", item.getItemLocation().getLatitude()));
-            binding.etLongitude.setText(String.format(Locale.US, "%f", item.getItemLocation().getLongitude()));
-        }
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fcvMap);
 
+        assert mapFragment != null;
+        mapFragment.getMapAsync(this);
 
-        binding.bFind.setOnClickListener(v -> {
-            String latitudeString = binding.etLatitude.getText().toString();
-            String longitudeString = binding.etLongitude.getText().toString();
-            updateItem(item, latitudeString, longitudeString);
-        });
+        binding.bFind.setOnClickListener(v -> updateItem(item));
     }
 
-    private ParseGeoPoint createGeoPoint(String latitudeString, String longitudeString) {
-        if(latitudeString.length() == 0 || longitudeString.length() == 0) {
-            Toast.makeText(this, "Please enter a value for latitude and longitude.", Toast.LENGTH_SHORT).show();
-            return null;
-        }
-
-        double latitude = Double.parseDouble(latitudeString);
-        double longitude = Double.parseDouble(longitudeString);
-
-        if(latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
-            Toast.makeText(this, "Please enter valid coordinates.", Toast.LENGTH_SHORT).show();
-            return null;
-        }
-        return new ParseGeoPoint(latitude, longitude);
-    }
-
-    private void updateItem(Item item, String latitudeString, String longitudeString) {
-        ParseGeoPoint parseGeoPoint = createGeoPoint(latitudeString, longitudeString);
-        if(parseGeoPoint == null) {
+    private void updateItem(Item item) {
+        if(mapMarker == null) {
+            Toast.makeText(this, "Tap to place a map marker.", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        LatLng markerPosition = mapMarker.getPosition();
+
+        ParseGeoPoint parseGeoPoint = new ParseGeoPoint(markerPosition.latitude, markerPosition.longitude);
 
         item.setItemLocation(parseGeoPoint);
         if(item instanceof LostItem) {
@@ -105,5 +96,26 @@ public class ItemLocationActivity extends AppCompatActivity {
         i.putExtra(FoundItem.class.getSimpleName(), item);
         startActivity(i);
         finish();
+    }
+
+    @Override
+    public void onMapReady(@NonNull GoogleMap googleMap) {
+        map = googleMap;
+        map.setOnMapClickListener(this);
+        ParseGeoPoint location = item.getItemLocation();
+        if(location != null) {
+            LatLng point = new LatLng(location.getLatitude(), location.getLongitude());
+            onMapClick(point);
+        }
+    }
+
+    @Override
+    public void onMapClick(@NonNull LatLng point) {
+        MarkerOptions options = new MarkerOptions().snippet("test");
+        options.position(point);
+        if(mapMarker != null) {
+            mapMarker.remove();
+        }
+        mapMarker = map.addMarker(options);
     }
 }
