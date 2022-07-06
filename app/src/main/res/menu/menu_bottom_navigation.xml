@@ -4,16 +4,19 @@
     <item
         android:id="@+id/action_lost"
         android:enabled="true"
+        android:icon="@android:drawable/ic_menu_mapmode"
         android:title="@string/lost"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_found"
         android:enabled="true"
+        android:icon="@android:drawable/ic_dialog_map"
         android:title="@string/found"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_profile"
         android:enabled="true"
+        android:icon="@android:drawable/ic_menu_my_calendar"
         android:title="@string/profile"
         app:showAsAction="ifRoom" />
 </menu>
