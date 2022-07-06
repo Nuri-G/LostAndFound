@@ -161,7 +161,7 @@ public class ItemLocationActivity extends AppCompatActivity implements OnMapRead
 
     @Override
     public void onMapClick(@NonNull LatLng point) {
-        MarkerOptions options = new MarkerOptions().snippet("test");
+        MarkerOptions options = new MarkerOptions().snippet("Item Location");
         options.position(point);
         if(mapMarker != null) {
             mapMarker.remove();
