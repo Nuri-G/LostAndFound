@@ -20,10 +20,10 @@
         android:id="@+id/tvItemNameDetails"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="4dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvMatchesLabel"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toEndOf="@+id/tvMatchesLabel"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="Pet Rock" />
 
     <TextView
@@ -50,12 +50,11 @@
         android:id="@+id/bEditItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:text="@string/edit_details"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvItemNameDetails" />
+        app:layout_constraintTop_toBottomOf="@+id/tvItemLocation" />
 
     <TextView
         android:id="@+id/tvItemDate"
