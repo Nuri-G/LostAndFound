@@ -93,7 +93,9 @@ public class LostFragment extends Fragment {
             }
             items.addAll(objects);
             adapter.notifyDataSetChanged();
-            binding.swipeRefreshLost.setRefreshing(false);
+            if(binding != null) {
+                binding.swipeRefreshLost.setRefreshing(false);
+            }
         });
     }
 

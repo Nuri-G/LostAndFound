@@ -94,7 +94,9 @@ public class FoundFragment extends Fragment {
             }
             items.addAll(objects);
             adapter.notifyDataSetChanged();
-            binding.swipeRefreshFound.setRefreshing(false);
+            if(binding != null) {
+                binding.swipeRefreshFound.setRefreshing(false);
+            }
         });
     }
 
