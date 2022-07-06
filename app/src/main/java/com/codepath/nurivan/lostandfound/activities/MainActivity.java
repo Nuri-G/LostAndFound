@@ -15,6 +15,7 @@ import com.codepath.nurivan.lostandfound.fragments.FoundFragment;
 import com.codepath.nurivan.lostandfound.fragments.LostFragment;
 import com.codepath.nurivan.lostandfound.fragments.ProfileFragment;
 import com.codepath.nurivan.lostandfound.models.FoundItem;
+import com.codepath.nurivan.lostandfound.models.Item;
 import com.codepath.nurivan.lostandfound.models.LostItem;
 import com.parse.ParseUser;
 
@@ -66,14 +67,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
 
-        if(intent.hasExtra(LostItem.class.getSimpleName())) {
-            LostItem item = intent.getParcelableExtra(LostItem.class.getSimpleName());
-            ((LostFragment) lostFragment).addLostItem(item);
-            binding.bottomNavigation.setSelectedItemId(R.id.action_lost);
-        } else if(intent.hasExtra(FoundItem.class.getSimpleName())) {
-            FoundItem item = intent.getParcelableExtra(FoundItem.class.getSimpleName());
-            ((FoundFragment) foundFragment).addFoundItem(item);
-            binding.bottomNavigation.setSelectedItemId(R.id.action_found);
+        if(intent.hasExtra(Item.class.getSimpleName())) {
+            Item item = intent.getParcelableExtra(Item.class.getSimpleName());
+            if(item instanceof LostItem) {
+                ((LostFragment) lostFragment).addLostItem((LostItem) item);
+                binding.bottomNavigation.setSelectedItemId(R.id.action_lost);
+            } else if(item instanceof FoundItem) {
+                ((FoundFragment) foundFragment).addFoundItem((FoundItem) item);
+                binding.bottomNavigation.setSelectedItemId(R.id.action_found);
+            }
         }
     }
 }

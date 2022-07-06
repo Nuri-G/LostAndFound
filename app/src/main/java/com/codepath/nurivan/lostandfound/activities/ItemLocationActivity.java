@@ -83,6 +83,8 @@ public class ItemLocationActivity extends AppCompatActivity implements OnMapRead
 
         item.setItemLocation(parseGeoPoint);
         if(item instanceof LostItem) {
+            binding.clMap.setVisibility(View.GONE);
+            binding.clFindingItem.setVisibility(View.VISIBLE);
             item.saveInBackground(e -> {
                 if(e != null) {
                     Log.e(TAG, "Failed to save item.", e);
@@ -92,8 +94,8 @@ public class ItemLocationActivity extends AppCompatActivity implements OnMapRead
 
                 item.setPossibleMatches();
 
-                Intent intent = new Intent(this, MainActivity.class);
-                intent.putExtra(LostItem.class.getSimpleName(), item);
+                Intent intent = new Intent(this, ItemDetailsActivity.class);
+                intent.putExtra(Item.class.getSimpleName(), item);
                 startActivity(intent);
                 finish();
             });

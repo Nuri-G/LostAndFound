@@ -58,7 +58,13 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
         updateDetails();
     }
 
-
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra(Item.class.getSimpleName(), item);
+        startActivity(intent);
+        finish();
+    }
 
     private void updateDetails() {
         if(item instanceof LostItem) {

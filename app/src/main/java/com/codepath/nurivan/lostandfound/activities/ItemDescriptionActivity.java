@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.codepath.nurivan.lostandfound.R;
 import com.codepath.nurivan.lostandfound.databinding.ActivityItemDescriptionBinding;
 import com.codepath.nurivan.lostandfound.models.FoundItem;
+import com.codepath.nurivan.lostandfound.models.Item;
 
 public class ItemDescriptionActivity extends AppCompatActivity {
     public static final String TAG = "ItemDescriptionActivity";
@@ -38,20 +39,24 @@ public class ItemDescriptionActivity extends AppCompatActivity {
         setUpSpinner(R.array.sizes_array, "size", binding.sSizes);
 
 
-        binding.bFindOwner.setOnClickListener(v -> item.saveInBackground(e -> {
-            if(e != null) {
-                Log.e(TAG, "Failed to save FoundItem", e);
-                Toast.makeText(this, "Failed to save item.", Toast.LENGTH_SHORT).show();
+        binding.bFindOwner.setOnClickListener(v -> {
+            binding.clItemDescription.setVisibility(View.GONE);
+            binding.clFindingItem.setVisibility(View.VISIBLE);
+            item.saveInBackground(e -> {
+                if(e != null) {
+                    Log.e(TAG, "Failed to save FoundItem", e);
+                    Toast.makeText(this, "Failed to save item.", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+
+                item.setPossibleMatches();
+
+                Intent intent = new Intent(this, ItemDetailsActivity.class);
+                intent.putExtra(Item.class.getSimpleName(), item);
+                startActivity(intent);
                 finish();
-            }
-
-            item.setPossibleMatches();
-
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.putExtra(FoundItem.class.getSimpleName(), item);
-            startActivity(intent);
-            finish();
-        }));
+            });
+        });
     }
 
     private void setUpSpinner(int arrayId, String spinnerType, Spinner spinner) {
