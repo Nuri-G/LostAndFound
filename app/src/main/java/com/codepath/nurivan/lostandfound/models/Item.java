@@ -64,6 +64,14 @@ public abstract class Item extends ParseObject {
         return "(" + String.format(Locale.US, "%.3f", point.getLatitude()) + ", " + String.format(Locale.US, "%.3f", point.getLongitude()) + ")";
     }
 
+    public static String formatItemName(String name) {
+        String shortName = String.format("%1.12s", name);
+        if(name.length() > 12) {
+            return shortName + "...";
+        }
+        return shortName;
+    }
+
     public void setPossibleMatches() {
         HashMap<String, Object> params = new HashMap<>();
         if(this instanceof LostItem) {

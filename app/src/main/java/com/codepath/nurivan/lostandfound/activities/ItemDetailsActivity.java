@@ -1,5 +1,7 @@
 package com.codepath.nurivan.lostandfound.activities;
 
+import static com.codepath.nurivan.lostandfound.models.Item.formatItemName;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.DefaultLifecycleObserver;
@@ -71,7 +73,7 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
             binding.tvItemDateLabel.setText(FOUND_DATE_LABEL);
         }
 
-        binding.tvItemNameDetails.setText(item.getItemName());
+        binding.tvItemNameDetails.setText(formatItemName(item.getItemName()));
         binding.tvItemLocation.setText(Item.formatItemCoordinates(item.getItemLocation()));
         adapter.loadMatches(item);
     }

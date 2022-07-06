@@ -1,5 +1,7 @@
 package com.codepath.nurivan.lostandfound.adapters;
 
+import static com.codepath.nurivan.lostandfound.models.Item.formatItemName;
+
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -71,7 +73,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
 
         public void bind(Item item) {
             this.item = item;
-            binding.tvItemName.setText(item.getItemName());
+            binding.tvItemName.setText(formatItemName(item.getItemName()));
 
 
             String coordinates = Item.formatItemCoordinates(item.getItemLocation());
