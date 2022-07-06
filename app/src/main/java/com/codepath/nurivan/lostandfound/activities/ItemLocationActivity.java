@@ -37,7 +37,7 @@ public class ItemLocationActivity extends AppCompatActivity implements OnMapRead
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        com.codepath.nurivan.lostandfound.databinding.ActivityItemLocationBinding binding = ActivityItemLocationBinding.inflate(getLayoutInflater());
+        ActivityItemLocationBinding binding = ActivityItemLocationBinding.inflate(getLayoutInflater());
 
         View view = binding.getRoot();
         setContentView(view);
