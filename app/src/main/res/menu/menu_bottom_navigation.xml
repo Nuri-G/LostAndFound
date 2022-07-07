@@ -4,25 +4,25 @@
     <item
         android:id="@+id/action_lost"
         android:enabled="true"
-        android:icon="@android:drawable/ic_menu_mapmode"
+        android:icon="@drawable/ic_baseline_wrong_location_24"
         android:title="@string/lost"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_found"
         android:enabled="true"
-        android:icon="@android:drawable/ic_menu_crop"
+        android:icon="@drawable/ic_baseline_find_in_page_24"
         android:title="@string/found"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_map"
         android:enabled="true"
-        android:icon="@android:drawable/ic_dialog_map"
+        android:icon="@drawable/ic_baseline_map_24"
         android:title="@string/map"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_profile"
         android:enabled="true"
-        android:icon="@android:drawable/ic_menu_my_calendar"
+        android:icon="@drawable/ic_baseline_person_24"
         android:title="@string/profile"
         app:showAsAction="ifRoom" />
 </menu>
