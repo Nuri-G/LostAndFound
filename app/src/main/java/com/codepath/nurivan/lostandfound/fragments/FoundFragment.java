@@ -111,4 +111,8 @@ public class FoundFragment extends Fragment {
         items.add(item);
         adapter.notifyItemInserted(items.size() - 1);
     }
+
+    public static List<Item> getItemList() {
+        return items;
+    }
 }

@@ -80,7 +80,7 @@ public class LostFragment extends Fragment {
         startActivity(i);
     }
 
-    private void getLostItems() {
+    public void getLostItems() {
         binding.swipeRefreshLost.setRefreshing(true);
         items.clear();
         ParseQuery<LostItem> query = ParseQuery.getQuery(LostItem.class);
@@ -109,5 +109,9 @@ public class LostFragment extends Fragment {
         }
         items.add(item);
         adapter.notifyItemInserted(items.size() - 1);
+    }
+
+    public static List<Item> getItemList() {
+        return items;
     }
 }
