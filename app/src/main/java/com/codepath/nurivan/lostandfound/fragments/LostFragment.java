@@ -82,7 +82,6 @@ public class LostFragment extends Fragment {
 
     public void getLostItems() {
         binding.swipeRefreshLost.setRefreshing(true);
-        items.clear();
         ParseQuery<LostItem> query = ParseQuery.getQuery(LostItem.class);
         query.whereEqualTo(LostItem.KEY_LOST_BY, ParseUser.getCurrentUser());
         query.setLimit(20);
@@ -91,6 +90,7 @@ public class LostFragment extends Fragment {
                 Log.e(TAG, "Error getting lost items", e);
                 return;
             }
+            items.clear();
             items.addAll(objects);
             adapter.notifyDataSetChanged();
             if(binding != null) {

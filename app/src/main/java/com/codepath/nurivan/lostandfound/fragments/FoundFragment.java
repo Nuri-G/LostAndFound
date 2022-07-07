@@ -83,7 +83,6 @@ public class FoundFragment extends Fragment {
 
     private void getFoundItems() {
         binding.swipeRefreshFound.setRefreshing(true);
-        items.clear();
         ParseQuery<FoundItem> query = ParseQuery.getQuery(FoundItem.class);
         query.whereEqualTo(FoundItem.KEY_FOUND_BY, ParseUser.getCurrentUser());
         query.setLimit(20);
@@ -92,6 +91,7 @@ public class FoundFragment extends Fragment {
                 Log.e(TAG, "Error getting found items", e);
                 return;
             }
+            items.clear();
             items.addAll(objects);
             adapter.notifyDataSetChanged();
             if(binding != null) {
