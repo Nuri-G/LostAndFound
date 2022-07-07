@@ -27,7 +27,7 @@ import java.util.List;
 public class FoundFragment extends Fragment {
     public static final String TAG = "FoundFragment";
 
-    private static final List<Item> items = new ArrayList<>();
+    private final List<Item> items = new ArrayList<>();
     private static String lastUserId = "";
 
     private FragmentFoundBinding binding;
@@ -107,15 +107,19 @@ public class FoundFragment extends Fragment {
         for(int i = 0; i < items.size(); i++) {
             if(items.get(i).getObjectId().equals(item.getObjectId())) {
                 items.set(i, item);
-                adapter.notifyItemChanged(i);
+                if(adapter != null) {
+                    adapter.notifyItemChanged(i);
+                }
                 return;
             }
         }
         items.add(item);
-        adapter.notifyItemInserted(items.size() - 1);
+        if(adapter != null) {
+            adapter.notifyItemInserted(items.size() - 1);
+        }
     }
 
-    public static List<Item> getItemList() {
+    public List<Item> getItemList() {
         return items;
     }
 }
