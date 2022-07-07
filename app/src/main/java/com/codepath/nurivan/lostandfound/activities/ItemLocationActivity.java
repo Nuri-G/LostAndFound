@@ -129,8 +129,6 @@ public class ItemLocationActivity extends AppCompatActivity implements OnMapRead
                 String location = binding.svMap.getQuery().toString();
                 location = location.trim();
 
-                System.out.println(location);
-
                 if(!location.isEmpty()) {
                     Geocoder geocoder = new Geocoder(ItemLocationActivity.this);
 
