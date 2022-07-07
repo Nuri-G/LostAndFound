@@ -28,13 +28,13 @@ public class LostFragment extends Fragment {
     public static final String TAG = "LostFragment";
 
     private static final List<Item> items = new ArrayList<>();
-    private static ParseUser lastUser = new ParseUser();
+    private static String lastUserId = "";
 
     private FragmentLostBinding binding;
     private ItemAdapter adapter;
 
     public LostFragment() {
-        // Required empty public constructor
+        getLostItems();
     }
 
     @Override
@@ -60,8 +60,9 @@ public class LostFragment extends Fragment {
         itemTouchHelper.attachToRecyclerView(binding.rvLostItems);
 
         binding.swipeRefreshLost.setOnRefreshListener(this::getLostItems);
-        if(items.isEmpty() || !lastUser.getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
-            lastUser = ParseUser.getCurrentUser();
+        String currentUserId = ParseUser.getCurrentUser().getObjectId();
+        if(items.isEmpty() || !lastUserId.equals(currentUserId)) {
+            lastUserId = currentUserId;
             getLostItems();
         }
     }
@@ -80,8 +81,10 @@ public class LostFragment extends Fragment {
         startActivity(i);
     }
 
-    public void getLostItems() {
-        binding.swipeRefreshLost.setRefreshing(true);
+    private void getLostItems() {
+        if(binding != null) {
+            binding.swipeRefreshLost.setRefreshing(true);
+        }
         ParseQuery<LostItem> query = ParseQuery.getQuery(LostItem.class);
         query.whereEqualTo(LostItem.KEY_LOST_BY, ParseUser.getCurrentUser());
         query.setLimit(20);
@@ -92,9 +95,9 @@ public class LostFragment extends Fragment {
             }
             items.clear();
             items.addAll(objects);
-            adapter.notifyDataSetChanged();
             if(binding != null) {
                 binding.swipeRefreshLost.setRefreshing(false);
+                adapter.notifyDataSetChanged();
             }
         });
     }

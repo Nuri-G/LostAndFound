@@ -28,13 +28,13 @@ public class FoundFragment extends Fragment {
     public static final String TAG = "FoundFragment";
 
     private static final List<Item> items = new ArrayList<>();
-    private static ParseUser lastUser = new ParseUser();
+    private static String lastUserId = "";
 
     private FragmentFoundBinding binding;
     private ItemAdapter adapter;
 
     public FoundFragment() {
-        // Required empty public constructor
+        getFoundItems();
     }
 
     @Override
@@ -61,8 +61,9 @@ public class FoundFragment extends Fragment {
 
         binding.swipeRefreshFound.setOnRefreshListener(this::getFoundItems);
 
-        if(items.isEmpty() || !lastUser.getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
-            lastUser = ParseUser.getCurrentUser();
+        String currentUserId = ParseUser.getCurrentUser().getObjectId();
+        if(items.isEmpty() || !lastUserId.equals(currentUserId)) {
+            lastUserId = currentUserId;
             getFoundItems();
         }
     }
@@ -82,7 +83,9 @@ public class FoundFragment extends Fragment {
     }
 
     private void getFoundItems() {
-        binding.swipeRefreshFound.setRefreshing(true);
+        if(binding != null) {
+            binding.swipeRefreshFound.setRefreshing(true);
+        }
         ParseQuery<FoundItem> query = ParseQuery.getQuery(FoundItem.class);
         query.whereEqualTo(FoundItem.KEY_FOUND_BY, ParseUser.getCurrentUser());
         query.setLimit(20);
@@ -93,9 +96,9 @@ public class FoundFragment extends Fragment {
             }
             items.clear();
             items.addAll(objects);
-            adapter.notifyDataSetChanged();
             if(binding != null) {
                 binding.swipeRefreshFound.setRefreshing(false);
+                adapter.notifyDataSetChanged();
             }
         });
     }
