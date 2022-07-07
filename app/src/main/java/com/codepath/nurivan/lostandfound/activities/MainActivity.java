@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private final HashMap<Marker, Item> markerItems = new HashMap<>();
 
     private Fragment currentFragment;
+    private GoogleMap googleMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return new LatLng(latitude, longitude);
     }
 
-    private void setMapPins(GoogleMap googleMap) {
+    private void setMapPins() {
         googleMap.clear();
         List<Item> allItems = new ArrayList<>();
         allItems.addAll(((LostFragment) lostFragment).getItemList());
@@ -146,11 +147,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 ((FoundFragment) foundFragment).addFoundItem((FoundItem) item);
             }
         }
+
+        if(currentFragment == mapFragment && googleMap != null) {
+            setMapPins();
+        }
     }
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
-        setMapPins(googleMap);
+        this.googleMap = googleMap;
+        setMapPins();
+
         googleMap.setOnInfoWindowClickListener(marker -> {
             Intent i = new Intent(MainActivity.this, ItemDetailsActivity.class);
             i.putExtra(Item.class.getSimpleName(), markerItems.get(marker));
