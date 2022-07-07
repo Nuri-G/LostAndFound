@@ -1,14 +1,13 @@
 package com.codepath.nurivan.lostandfound.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.codepath.nurivan.lostandfound.R;
 import com.codepath.nurivan.lostandfound.databinding.ActivityMainBinding;
@@ -18,6 +17,7 @@ import com.codepath.nurivan.lostandfound.fragments.ProfileFragment;
 import com.codepath.nurivan.lostandfound.models.FoundItem;
 import com.codepath.nurivan.lostandfound.models.Item;
 import com.codepath.nurivan.lostandfound.models.LostItem;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -76,13 +76,39 @@ public class MainActivity extends AppCompatActivity {
         Log.i(TAG, "Current User: " + ParseUser.getCurrentUser().getUsername());
     }
 
+    private LatLng calculateAverageLocation(List<Item> items) {
+        double totalX = 0;
+        double totalY = 0;
+        double totalZ = 0;
+
+        for(Item item : items) {
+            double latitude = Math.toRadians(item.getItemLocation().getLatitude());
+            double longitude = Math.toRadians(item.getItemLocation().getLongitude());
+            totalX += Math.cos(latitude) * Math.cos(longitude);
+            totalY += Math.cos(latitude) * Math.sin(longitude);
+            totalZ += Math.sin(latitude);
+        }
+        double avgX = totalX / items.size();
+        double avgY = totalY / items.size();
+        double avgZ = totalZ / items.size();
+
+        double longitude = Math.toDegrees(Math.atan2(avgY, avgX));
+        double hypotenuse = Math.sqrt(avgX * avgX + avgY * avgY);
+        double latitude = Math.toDegrees(Math.atan2(avgZ, hypotenuse));
+
+        return new LatLng(latitude, longitude);
+    }
+
     private void setMapPins() {
         ((SupportMapFragment) mapFragment).getMapAsync(googleMap -> {
+            googleMap.clear();
             List<Item> allItems = new ArrayList<>();
             allItems.addAll(LostFragment.getItemList());
             allItems.addAll(FoundFragment.getItemList());
             for(Item item : allItems) {
-                MarkerOptions options = new MarkerOptions().snippet(item.getItemName());
+                MarkerOptions options = new MarkerOptions();
+                options.title(item.getItemName());
+                options.snippet(Item.formatItemCoordinates(item.getItemLocation()));
                 ParseGeoPoint location = item.getItemLocation();
                 LatLng point = new LatLng(location.getLatitude(), location.getLongitude());
                 options.position(point);
@@ -92,8 +118,12 @@ public class MainActivity extends AppCompatActivity {
                     options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
                 }
 
+
                 googleMap.addMarker(options);
             }
+
+            LatLng avgLocation = calculateAverageLocation(allItems);
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(avgLocation, 2));
         });
     }
 
