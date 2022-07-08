@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,6 +19,7 @@ import com.codepath.nurivan.lostandfound.databinding.ItemLayoutBinding;
 import com.codepath.nurivan.lostandfound.models.FoundItem;
 import com.codepath.nurivan.lostandfound.models.Item;
 import com.codepath.nurivan.lostandfound.models.LostItem;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Date;
 import java.util.List;
@@ -112,9 +114,13 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
 
     public static class SwipeHelper extends ItemTouchHelper.SimpleCallback {
         private final ItemAdapter adapter;
-        public SwipeHelper(ItemAdapter adapter) {
+        private final CoordinatorLayout layout;
+        private boolean cancelDelete = false;
+
+        public SwipeHelper(CoordinatorLayout layout, ItemAdapter adapter) {
             super(0, ItemTouchHelper.LEFT);
             this.adapter = adapter;
+            this.layout = layout;
         }
 
         @Override
@@ -125,7 +131,25 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
             int position = viewHolder.getAdapterPosition();
-            adapter.deleteItem(position);
+
+            Snackbar snackbar = Snackbar
+                    .make(layout, "Item was deleted.", Snackbar.LENGTH_SHORT);
+            snackbar.setAction("UNDO", view -> cancelDelete = true);
+
+            snackbar.addCallback(new Snackbar.Callback() {
+                @Override
+                public void onDismissed(Snackbar snackbar, int event) {
+                    if(cancelDelete) {
+                        adapter.notifyItemChanged(position);
+                    } else {
+                        adapter.deleteItem(position);
+                    }
+
+                    cancelDelete = false;
+                }
+            });
+            snackbar.show();
+
         }
     }
 }

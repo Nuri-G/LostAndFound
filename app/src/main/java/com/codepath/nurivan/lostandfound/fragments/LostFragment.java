@@ -56,7 +56,7 @@ public class LostFragment extends Fragment {
         binding.rvLostItems.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.rvLostItems.setAdapter(adapter);
 
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemAdapter.SwipeHelper(adapter));
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemAdapter.SwipeHelper(binding.getRoot(), adapter));
         itemTouchHelper.attachToRecyclerView(binding.rvLostItems);
 
         binding.swipeRefreshLost.setOnRefreshListener(this::getLostItems);

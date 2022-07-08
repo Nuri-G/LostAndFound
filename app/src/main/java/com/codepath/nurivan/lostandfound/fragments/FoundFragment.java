@@ -56,7 +56,7 @@ public class FoundFragment extends Fragment {
         binding.rvFoundItems.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.rvFoundItems.setAdapter(adapter);
 
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemAdapter.SwipeHelper(adapter));
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemAdapter.SwipeHelper(binding.getRoot(), adapter));
         itemTouchHelper.attachToRecyclerView(binding.rvFoundItems);
 
         binding.swipeRefreshFound.setOnRefreshListener(this::getFoundItems);
