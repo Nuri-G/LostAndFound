@@ -1,5 +1,7 @@
 package com.codepath.nurivan.lostandfound.adapters;
 
+import static com.codepath.nurivan.lostandfound.models.Item.formatItemName;
+
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -15,8 +17,10 @@ import com.codepath.nurivan.lostandfound.activities.OwnershipVerificationActivit
 import com.codepath.nurivan.lostandfound.databinding.MatchLayoutBinding;
 import com.codepath.nurivan.lostandfound.models.FoundItem;
 import com.codepath.nurivan.lostandfound.models.Item;
+import com.codepath.nurivan.lostandfound.models.LostItem;
 import com.codepath.nurivan.lostandfound.models.Match;
 import com.parse.FunctionCallback;
+import com.parse.GetCallback;
 import com.parse.ParseCloud;
 
 import org.json.JSONArray;
@@ -97,6 +101,20 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
 
         public void bind(Match match) {
             this.match = match;
+
+            GetCallback<Item> callback = (otherItem, e) -> {
+                if(e != null) {
+                    Log.e(TAG, "Error binding match.", e);
+                    return;
+                }
+
+                binding.tvOtherItemName.setText(formatItemName(otherItem.getItemName()));
+            };
+            if(item instanceof LostItem) {
+                match.getFoundItem(callback);
+            } else if(item instanceof FoundItem) {
+                match.getLostItem(callback);
+            }
             double distance = match.getDistanceMiles().doubleValue();
             double score = match.getMatchScore().doubleValue();
 
