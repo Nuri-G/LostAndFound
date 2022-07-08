@@ -1,7 +1,5 @@
 package com.codepath.nurivan.lostandfound.models;
 
-import android.util.Log;
-
 import com.parse.FunctionCallback;
 import com.parse.ParseCloud;
 import com.parse.ParseGeoPoint;
@@ -20,7 +18,6 @@ public abstract class Item extends ParseObject {
     public static final String KEY_ITEM_NAME = "itemName";
     public static final String KEY_ITEM_LOCATION = "itemLocation";
     public static final String KEY_POSSIBLE_MATCHES = "possibleMatches";
-    public static final String KEY_CONFIRMED_MATCH = "confirmedMatches";
 
     public String getItemName() {
         return getString(KEY_ITEM_NAME);
@@ -37,16 +34,8 @@ public abstract class Item extends ParseObject {
         put(KEY_ITEM_LOCATION, itemLocation);
     }
 
-    public void setPossibleMatches(JSONArray matches) {
-        put(KEY_POSSIBLE_MATCHES, matches);
-    }
-
     public JSONArray getPossibleMatches() {
         return getJSONArray(KEY_POSSIBLE_MATCHES);
-    }
-
-    public Item getConfirmedMatch() {
-        return (Item) getParseObject(KEY_CONFIRMED_MATCH);
     }
 
     public static String formatItemDate(Date date) {
@@ -72,17 +61,13 @@ public abstract class Item extends ParseObject {
         return shortName;
     }
 
-    public void setPossibleMatches() {
-        HashMap<String, Object> params = new HashMap<>();
+    public void setPossibleMatches(FunctionCallback<Object> callback) {
+        HashMap<String, String> params = new HashMap<>();
         if(this instanceof LostItem) {
             params.put("lostItemId", getObjectId());
         } else if(this instanceof FoundItem) {
             params.put("foundItemId", getObjectId());
         }
-        ParseCloud.callFunctionInBackground("updateMatches", params, (FunctionCallback<Float>) (object, e) -> {
-            if(e != null) {
-                Log.e(TAG, "Failed to set matches: ", e);
-            }
-        });
+        ParseCloud.callFunctionInBackground("updateMatches", params, callback);
     }
 }

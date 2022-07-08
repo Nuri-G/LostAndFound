@@ -26,6 +26,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 
 import java.io.IOException;
@@ -92,12 +93,23 @@ public class ItemLocationActivity extends AppCompatActivity implements OnMapRead
                     finish();
                 }
 
-                item.setPossibleMatches();
+                item.setPossibleMatches((object, e1) -> {
+                    if(e1 != null) {
+                        Log.e(TAG, "Failed to set possible matches.", e1);
+                        finish();
+                    }
 
-                Intent intent = new Intent(this, ItemDetailsActivity.class);
-                intent.putExtra(Item.class.getSimpleName(), item);
-                startActivity(intent);
-                finish();
+                    try {
+                        item.fetch();
+                    } catch (ParseException ex) {
+                        ex.printStackTrace();
+                    }
+
+                    Intent intent = new Intent(ItemLocationActivity.this, ItemDetailsActivity.class);
+                    intent.putExtra(Item.class.getSimpleName(), item);
+                    startActivity(intent);
+                    finish();
+                });
             });
         } else if(item instanceof FoundItem) {
             showItemDetailsActivity((FoundItem) item);

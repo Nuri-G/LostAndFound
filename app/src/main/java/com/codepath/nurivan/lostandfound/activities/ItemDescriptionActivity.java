@@ -1,7 +1,5 @@
 package com.codepath.nurivan.lostandfound.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,10 +9,13 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.codepath.nurivan.lostandfound.R;
 import com.codepath.nurivan.lostandfound.databinding.ActivityItemDescriptionBinding;
 import com.codepath.nurivan.lostandfound.models.FoundItem;
 import com.codepath.nurivan.lostandfound.models.Item;
+import com.parse.ParseException;
 
 public class ItemDescriptionActivity extends AppCompatActivity {
     public static final String TAG = "ItemDescriptionActivity";
@@ -49,12 +50,21 @@ public class ItemDescriptionActivity extends AppCompatActivity {
                     finish();
                 }
 
-                item.setPossibleMatches();
-
-                Intent intent = new Intent(this, ItemDetailsActivity.class);
-                intent.putExtra(Item.class.getSimpleName(), item);
-                startActivity(intent);
-                finish();
+                item.setPossibleMatches((object, e1) -> {
+                    if(e1 != null) {
+                        Log.e(TAG, "Failed to set possible matches.", e1);
+                        finish();
+                    }
+                    try {
+                        item.fetch();
+                    } catch (ParseException ex) {
+                        ex.printStackTrace();
+                    }
+                    Intent intent = new Intent(ItemDescriptionActivity.this, ItemDetailsActivity.class);
+                    intent.putExtra(Item.class.getSimpleName(), item);
+                    startActivity(intent);
+                    finish();
+                });
             });
         });
     }
