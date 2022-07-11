@@ -77,10 +77,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
             this.item = item;
             binding.tvItemName.setText(formatItemName(item.getItemName()));
 
-
-            String coordinates = Item.formatItemCoordinates(item.getItemLocation());
-
-            binding.tvCoordinates.setText(coordinates);
+            binding.tvLocation.setText(item.getItemAddress());
 
             Date date = new Date();
 

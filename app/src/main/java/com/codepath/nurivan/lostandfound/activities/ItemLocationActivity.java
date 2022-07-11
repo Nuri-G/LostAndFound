@@ -46,6 +46,7 @@ public class ItemLocationActivity extends AppCompatActivity implements OnMapRead
     private GoogleMap map;
     private Marker mapMarker;
     private Item item;
+    private Geocoder geocoder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +67,8 @@ public class ItemLocationActivity extends AppCompatActivity implements OnMapRead
             binding.bFind.setText(FOUND_BUTTON);
         }
 
+        geocoder = new Geocoder(ItemLocationActivity.this);
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fcvMap);
 
         assert mapFragment != null;
@@ -81,10 +84,23 @@ public class ItemLocationActivity extends AppCompatActivity implements OnMapRead
         }
 
         LatLng markerPosition = mapMarker.getPosition();
-
         ParseGeoPoint parseGeoPoint = new ParseGeoPoint(markerPosition.latitude, markerPosition.longitude);
-
         item.setItemLocation(parseGeoPoint);
+
+        List<Address> addressList = null;
+        try {
+            addressList = geocoder.getFromLocation(markerPosition.latitude, markerPosition.longitude, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if(addressList != null && !addressList.isEmpty()) {
+            Address address = addressList.get(0);
+            item.setItemAddress(address.getLocality() + ", " + address.getAdminArea());
+        } else {
+            item.setItemAddress(Item.formatItemCoordinates(parseGeoPoint));
+        }
+
+
         if(item instanceof LostItem) {
             binding.clMap.setVisibility(View.GONE);
             binding.clFindingItem.setVisibility(View.VISIBLE);
@@ -157,8 +173,6 @@ public class ItemLocationActivity extends AppCompatActivity implements OnMapRead
                 location = location.trim();
 
                 if(!location.isEmpty()) {
-                    Geocoder geocoder = new Geocoder(ItemLocationActivity.this);
-
                     try {
                         List<Address> addressList = geocoder.getFromLocationName(location, 1);
                         if(addressList.isEmpty()) {

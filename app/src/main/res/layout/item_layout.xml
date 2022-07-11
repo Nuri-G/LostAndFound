@@ -35,7 +35,7 @@
             tools:text="Lost on 6/2/2022" />
 
         <TextView
-            android:id="@+id/tvCoordinates"
+            android:id="@+id/tvLocation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="128dp"

@@ -98,7 +98,7 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
         }
 
         binding.tvItemNameDetails.setText(formatItemName(item.getItemName()));
-        binding.tvItemLocation.setText(Item.formatItemCoordinates(item.getItemLocation()));
+        binding.tvItemLocation.setText(item.getItemAddress());
         adapter.loadMatches(item);
     }
 }

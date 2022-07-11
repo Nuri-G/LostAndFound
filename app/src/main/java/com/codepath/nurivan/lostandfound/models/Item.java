@@ -18,6 +18,7 @@ public abstract class Item extends ParseObject {
     public static final String KEY_ITEM_NAME = "itemName";
     public static final String KEY_ITEM_LOCATION = "itemLocation";
     public static final String KEY_POSSIBLE_MATCHES = "possibleMatches";
+    public static final String KEY_ITEM_ADDRESS = "itemAddress";
 
     public String getItemName() {
         return getString(KEY_ITEM_NAME);
@@ -36,6 +37,14 @@ public abstract class Item extends ParseObject {
 
     public JSONArray getPossibleMatches() {
         return getJSONArray(KEY_POSSIBLE_MATCHES);
+    }
+
+    public void setItemAddress(String address) {
+        put(KEY_ITEM_ADDRESS, address);
+    }
+
+    public String getItemAddress() {
+        return getString(KEY_ITEM_ADDRESS);
     }
 
     public static String formatItemDate(Date date) {
