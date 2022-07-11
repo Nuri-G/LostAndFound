@@ -127,6 +127,7 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
 
             if(match.isVerified()) {
                 binding.bVerify.setVisibility(View.GONE);
+                binding.tvVerification.setVisibility(View.GONE);
                 binding.bEmail.setVisibility(View.VISIBLE);
                 binding.bEmail.setOnClickListener(v -> {
                     HashMap<String, String> params = new HashMap<>();
