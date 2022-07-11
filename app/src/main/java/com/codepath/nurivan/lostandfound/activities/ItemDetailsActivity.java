@@ -53,6 +53,7 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
         adapter = new MatchAdapter(this, item);
         binding.rvMatches.setLayoutManager(new LinearLayoutManager(this));
         binding.rvMatches.setAdapter(adapter);
+        binding.swipeRefreshMatches.setRefreshing(true);
         binding.swipeRefreshMatches.setOnRefreshListener(this::updateItemDetails);
     }
 
@@ -78,9 +79,6 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
             }
 
             displayItemDetails();
-            if(binding != null) {
-                binding.swipeRefreshMatches.setRefreshing(false);
-            }
         });
     }
 
@@ -100,5 +98,8 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
         binding.tvItemNameDetails.setText(formatItemName(item.getItemName()));
         binding.tvItemLocation.setText(item.getItemAddress());
         adapter.loadMatches(item);
+        if(binding != null) {
+            binding.swipeRefreshMatches.setRefreshing(false);
+        }
     }
 }
