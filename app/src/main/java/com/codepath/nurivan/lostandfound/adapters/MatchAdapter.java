@@ -109,6 +109,7 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
                 }
 
                 binding.tvOtherItemName.setText(formatItemName(otherItem.getItemName()));
+                binding.tvCity.setText(otherItem.getItemAddress());
             };
             if(item instanceof LostItem) {
                 match.getFoundItem(callback);
@@ -119,7 +120,7 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
             double score = match.getMatchScore().doubleValue();
 
             String distanceString = String.format(Locale.US,"%.2f mi", distance);
-            String scoreString = String.format(Locale.US, "%.2f%% match,", score * 100);
+            String scoreString = String.format(Locale.US, "%.2f%% match", score * 100);
 
             binding.tvMatchDistance.setText(distanceString);
             binding.tvMatchScore.setText(scoreString);

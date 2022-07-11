@@ -18,6 +18,7 @@ import com.codepath.nurivan.lostandfound.databinding.ActivityItemLocationBinding
 import com.codepath.nurivan.lostandfound.models.FoundItem;
 import com.codepath.nurivan.lostandfound.models.Item;
 import com.codepath.nurivan.lostandfound.models.LostItem;
+import com.codepath.nurivan.lostandfound.models.StateAbbreviations;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -95,7 +96,7 @@ public class ItemLocationActivity extends AppCompatActivity implements OnMapRead
         }
         if(addressList != null && !addressList.isEmpty()) {
             Address address = addressList.get(0);
-            item.setItemAddress(address.getLocality() + ", " + address.getAdminArea());
+            item.setItemAddress(address.getLocality() + ", " + StateAbbreviations.get(address.getAdminArea()));
         } else {
             item.setItemAddress(Item.formatItemCoordinates(parseGeoPoint));
         }
