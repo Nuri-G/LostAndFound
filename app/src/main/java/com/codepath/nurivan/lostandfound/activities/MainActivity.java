@@ -158,6 +158,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         this.googleMap = googleMap;
         setMapPins();
 
+        googleMap.setOnMarkerClickListener(marker -> {
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 10));
+            marker.showInfoWindow();
+            return true;
+        });
+
         googleMap.setOnInfoWindowClickListener(marker -> {
             Intent i = new Intent(MainActivity.this, ItemDetailsActivity.class);
             i.putExtra(Item.class.getSimpleName(), markerItems.get(marker));
