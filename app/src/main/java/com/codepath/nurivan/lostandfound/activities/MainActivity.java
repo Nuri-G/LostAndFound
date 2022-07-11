@@ -25,6 +25,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -88,40 +89,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.i(TAG, "Current User: " + ParseUser.getCurrentUser().getUsername());
     }
 
-    private LatLng calculateAverageLocation(List<Item> items) {
-        double totalX = 0;
-        double totalY = 0;
-        double totalZ = 0;
-
-        for(Item item : items) {
-            double latitude = Math.toRadians(item.getItemLocation().getLatitude());
-            double longitude = Math.toRadians(item.getItemLocation().getLongitude());
-            totalX += Math.cos(latitude) * Math.cos(longitude);
-            totalY += Math.cos(latitude) * Math.sin(longitude);
-            totalZ += Math.sin(latitude);
-        }
-        double avgX = totalX / items.size();
-        double avgY = totalY / items.size();
-        double avgZ = totalZ / items.size();
-
-        double longitude = Math.toDegrees(Math.atan2(avgY, avgX));
-        double hypotenuse = Math.sqrt(avgX * avgX + avgY * avgY);
-        double latitude = Math.toDegrees(Math.atan2(avgZ, hypotenuse));
-
-        return new LatLng(latitude, longitude);
-    }
-
     private void setMapPins() {
         googleMap.clear();
         List<Item> allItems = new ArrayList<>();
         allItems.addAll(((LostFragment) lostFragment).getItemList());
         allItems.addAll(((FoundFragment) foundFragment).getItemList());
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
         for(Item item : allItems) {
             MarkerOptions options = new MarkerOptions();
             options.title(item.getItemName());
             options.snippet(Item.formatItemCoordinates(item.getItemLocation()));
             ParseGeoPoint location = item.getItemLocation();
             LatLng point = new LatLng(location.getLatitude(), location.getLongitude());
+            builder.include(point);
             options.position(point);
             if(item instanceof LostItem) {
                 options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
@@ -132,9 +112,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             Marker m = googleMap.addMarker(options);
             markerItems.put(m, item);
         }
+        LatLngBounds bounds = builder.build();
 
-        LatLng avgLocation = calculateAverageLocation(allItems);
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(avgLocation, 2));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 80));
     }
 
     @Override
@@ -159,6 +139,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(@NonNull GoogleMap googleMap) {
         this.googleMap = googleMap;
 
+        googleMap.setMaxZoomPreference(18);
+
         //Making the map dark if it is night mode
         int nightModeFlags = getResources().getConfiguration().uiMode &
                         Configuration.UI_MODE_NIGHT_MASK;
@@ -174,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setMapPins();
 
         googleMap.setOnMarkerClickListener(marker -> {
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 10));
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 15));
             marker.showInfoWindow();
             return true;
         });
