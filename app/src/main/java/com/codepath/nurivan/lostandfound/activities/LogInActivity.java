@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.codepath.nurivan.lostandfound.databinding.ActivityLogInBinding;
+import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 
 public class LogInActivity extends AppCompatActivity {
@@ -45,6 +46,10 @@ public class LogInActivity extends AppCompatActivity {
                 Toast.makeText(this, "Failed to log in.", Toast.LENGTH_SHORT).show();
                 return;
             }
+
+            ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+            installation.put("userId", ParseUser.getCurrentUser().getObjectId());
+            installation.saveInBackground();
 
 
             showMainActivity();

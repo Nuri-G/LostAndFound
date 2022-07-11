@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.codepath.nurivan.lostandfound.databinding.ActivitySignUpBinding;
+import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 
 public class SignUpActivity extends AppCompatActivity {
@@ -69,6 +70,10 @@ public class SignUpActivity extends AppCompatActivity {
 
         user.signUpInBackground(e -> {
             if (e == null) {
+                ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+                installation.put("userId", ParseUser.getCurrentUser().getObjectId());
+                installation.saveInBackground();
+
                 Toast.makeText(SignUpActivity.this, "Created account.", Toast.LENGTH_SHORT).show();
                 showMainActivity();
             } else {
