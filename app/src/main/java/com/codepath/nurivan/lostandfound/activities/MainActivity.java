@@ -1,6 +1,7 @@
 package com.codepath.nurivan.lostandfound.activities;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -24,6 +25,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseGeoPoint;
@@ -156,6 +158,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         this.googleMap = googleMap;
+
+        //Making the map dark if it is night mode
+        int nightModeFlags = getResources().getConfiguration().uiMode &
+                        Configuration.UI_MODE_NIGHT_MASK;
+        switch (nightModeFlags) {
+            case Configuration.UI_MODE_NIGHT_YES:
+                googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_night));
+                break;
+
+            case Configuration.UI_MODE_NIGHT_NO:
+                break;
+        }
+
         setMapPins();
 
         googleMap.setOnMarkerClickListener(marker -> {

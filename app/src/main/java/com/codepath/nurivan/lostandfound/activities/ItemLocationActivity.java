@@ -1,6 +1,7 @@
 package com.codepath.nurivan.lostandfound.activities;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseException;
@@ -126,6 +128,19 @@ public class ItemLocationActivity extends AppCompatActivity implements OnMapRead
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         map = googleMap;
+
+        //Making the map dark if it is night mode
+        int nightModeFlags = getResources().getConfiguration().uiMode &
+                Configuration.UI_MODE_NIGHT_MASK;
+        switch (nightModeFlags) {
+            case Configuration.UI_MODE_NIGHT_YES:
+                googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_night));
+                break;
+
+            case Configuration.UI_MODE_NIGHT_NO:
+                break;
+        }
+
         map.setOnMapClickListener(this);
         ParseGeoPoint location = item.getItemLocation();
         if(location != null) {
