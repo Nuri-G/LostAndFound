@@ -2,15 +2,17 @@ package com.codepath.nurivan.lostandfound.activities;
 
 import static com.codepath.nurivan.lostandfound.models.Item.formatItemName;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
-
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.View;
 
 import com.codepath.nurivan.lostandfound.adapters.MatchAdapter;
 import com.codepath.nurivan.lostandfound.databinding.ActivityItemDetailsBinding;
@@ -51,11 +53,12 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
         adapter = new MatchAdapter(this, item);
         binding.rvMatches.setLayoutManager(new LinearLayoutManager(this));
         binding.rvMatches.setAdapter(adapter);
+        binding.swipeRefreshMatches.setOnRefreshListener(this::updateItemDetails);
     }
 
     @Override
     public void onResume(@NonNull LifecycleOwner owner) {
-        updateDetails();
+        displayItemDetails();
     }
 
     @Override
@@ -66,7 +69,22 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
         finish();
     }
 
-    private void updateDetails() {
+    private void updateItemDetails() {
+        item.fetchInBackground((object, e) -> {
+            if(e != null) {
+                Toast.makeText(ItemDetailsActivity.this, "Failed to get item.", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Error fetching item.", e);
+                return;
+            }
+
+            displayItemDetails();
+            if(binding != null) {
+                binding.swipeRefreshMatches.setRefreshing(false);
+            }
+        });
+    }
+
+    private void displayItemDetails() {
         if(item instanceof LostItem) {
             LostItem lostItem = (LostItem) item;
 
