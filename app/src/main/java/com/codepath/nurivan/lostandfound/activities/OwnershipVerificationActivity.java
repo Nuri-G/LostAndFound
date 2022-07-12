@@ -1,6 +1,7 @@
 package com.codepath.nurivan.lostandfound.activities;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -17,6 +18,7 @@ import com.parse.ParseCloud;
 import java.util.HashMap;
 
 public class OwnershipVerificationActivity extends AppCompatActivity {
+    public static final String TAG = "OwnershipVerificationActivity";
 
     private HashMap<String, String> quizAnswers;
     private ActivityOwnershipVerificationBinding binding;
@@ -42,6 +44,11 @@ public class OwnershipVerificationActivity extends AppCompatActivity {
             binding.bSubmitQuiz.setVisibility(View.GONE);
             binding.pbLoadingResults.setVisibility(View.VISIBLE);
             ParseCloud.callFunctionInBackground("submitQuiz", quizAnswers, (passed, e) -> {
+                if(e != null) {
+                    Toast.makeText(OwnershipVerificationActivity.this, "Failed to submit quiz.", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Error submitting quiz.", e);
+                    finish();
+                }
                 if((Boolean) passed) {
                     Toast.makeText(getApplicationContext(), "Verification successful.", Toast.LENGTH_SHORT).show();
                 } else {

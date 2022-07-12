@@ -4,6 +4,8 @@ import com.parse.GetCallback;
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
 
+import org.json.JSONArray;
+
 @ParseClassName("Match")
 public class Match extends ParseObject {
     public static final String KEY_LOST_ITEM = "lostItem";
@@ -11,6 +13,7 @@ public class Match extends ParseObject {
     public static final String KEY_MATCH_SCORE = "matchScore";
     public static final String KEY_DISTANCE_MILES = "distanceMiles";
     public static final String KEY_VERIFIED = "verified";
+    private static final String KEY_MEETING_PLACES = "meetingPlaces";
 
     public void getLostItem(GetCallback<Item> callback) {
         ParseObject lostItem = getParseObject(KEY_LOST_ITEM);
@@ -36,5 +39,9 @@ public class Match extends ParseObject {
 
     public Boolean isVerified() {
         return getBoolean(KEY_VERIFIED);
+    }
+
+    public JSONArray getMeetingPlaces() {
+        return getJSONArray(KEY_MEETING_PLACES);
     }
 }

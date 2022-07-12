@@ -25,6 +25,7 @@ import com.parse.ParseCloud;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -137,7 +138,11 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
                             Toast.makeText(context, "Failed to get email address.", Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        showSendEmailActivity(emailAddress);
+                        try {
+                            showSendEmailActivity(emailAddress);
+                        } catch (JSONException ex) {
+                            ex.printStackTrace();
+                        }
                     });
                 });
             } else if(item instanceof FoundItem) {
@@ -148,11 +153,18 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
             }
         }
 
-        private void showSendEmailActivity(String emailAddress) {
+        private void showSendEmailActivity(String emailAddress) throws JSONException {
+            JSONArray meetingPlaces = match.getMeetingPlaces();
+            StringBuilder emailString = new StringBuilder("Suggested meeting places: ");
+            for(int i = 0; i < meetingPlaces.length(); i++) {
+                JSONObject meetingPlace = meetingPlaces.getJSONObject(i);
+                emailString.append("\n    Name: ").append(meetingPlace.getString("locationName"));
+                emailString.append("\n    Address: ").append(meetingPlace.getString("address")).append('\n');
+            }
             Intent emailIntent = new Intent(Intent.ACTION_SEND);
             emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{ emailAddress });
             emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Lost and Found Item");
-            emailIntent.putExtra(Intent.EXTRA_TEXT, "Your message here...");
+            emailIntent.putExtra(Intent.EXTRA_TEXT, emailString.toString());
 
             emailIntent.setType("message/rfc822");
             context.startActivity(Intent.createChooser(emailIntent, "Choose an Email client :"));
