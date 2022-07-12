@@ -3,6 +3,8 @@ package com.codepath.nurivan.lostandfound.activities;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -11,8 +13,13 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.codepath.nurivan.lostandfound.databinding.ActivitySignUpBinding;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.LatLng;
 import com.parse.ParseInstallation;
 import com.parse.ParseUser;
+
+import java.io.IOException;
+import java.util.List;
 
 public class SignUpActivity extends AppCompatActivity {
     public static final String TAG = "SignUpActivity";
@@ -27,10 +34,10 @@ public class SignUpActivity extends AppCompatActivity {
         setContentView(view);
 
         binding.bSignUp.setOnClickListener(v -> {
-            String username = binding.etUsername.getText().toString();
+            String username = binding.etUsername.getText().toString().trim();
             String password = binding.etPassword.getText().toString();
-            String emailAddress = binding.etEmailAddress.getText().toString();
-            String homeAddress = binding.etHomeAddress.getText().toString();
+            String emailAddress = binding.etEmailAddress.getText().toString().trim();
+            String homeAddress = binding.etHomeAddress.getText().toString().trim();
             String confirmedPassword = binding.etConfirmPassword.getText().toString();
 
             signUpUser(username, emailAddress, homeAddress, password, confirmedPassword);
@@ -39,6 +46,24 @@ public class SignUpActivity extends AppCompatActivity {
 
     private boolean isValidEmail(String emailAddress) {
         return !TextUtils.isEmpty(emailAddress) && Patterns.EMAIL_ADDRESS.matcher(emailAddress).matches();
+    }
+
+    private boolean isValidLocation(String location) {
+        location = location.trim();
+        Geocoder geocoder = new Geocoder(this);
+
+        if(!location.isEmpty()) {
+            try {
+                List<Address> addressList = geocoder.getFromLocationName(location, 1);
+                if(addressList.size() == 1) {
+                    return true;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return false;
     }
 
     private void signUpUser(String username, String emailAddress, String homeAddress, String password, String confirmedPassword) {
@@ -58,14 +83,16 @@ public class SignUpActivity extends AppCompatActivity {
             return;
         }
 
+        if(!isValidLocation(homeAddress)) {
+            Toast.makeText(this, "Home location is not valid.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         ParseUser.logOut();
         ParseUser user = new ParseUser();
         user.setPassword(password);
         user.setUsername(username);
         user.setEmail(emailAddress);
-
-
-        // TODO - Need to verify that home address is a real place
         user.put("homeAddress", homeAddress);
 
         user.signUpInBackground(e -> {
