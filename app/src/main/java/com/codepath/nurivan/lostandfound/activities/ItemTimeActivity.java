@@ -53,6 +53,7 @@ public class ItemTimeActivity extends AppCompatActivity {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         binding.dpItemTime.updateDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+        binding.dpItemTime.setMaxDate(System.currentTimeMillis());
 
         binding.bToLocation.setOnClickListener(v -> {
             setItemDate(item);
