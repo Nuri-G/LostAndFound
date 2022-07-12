@@ -112,9 +112,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             Marker m = googleMap.addMarker(options);
             markerItems.put(m, item);
         }
-        LatLngBounds bounds = builder.build();
 
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 80));
+        if(!allItems.isEmpty()) {
+            LatLngBounds bounds = builder.build();
+
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 80));
+        }
     }
 
     @Override
