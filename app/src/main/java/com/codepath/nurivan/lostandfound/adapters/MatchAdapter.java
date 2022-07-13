@@ -2,6 +2,9 @@ package com.codepath.nurivan.lostandfound.adapters;
 
 import static com.codepath.nurivan.lostandfound.models.Item.formatItemName;
 
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -19,6 +22,7 @@ import com.codepath.nurivan.lostandfound.models.FoundItem;
 import com.codepath.nurivan.lostandfound.models.Item;
 import com.codepath.nurivan.lostandfound.models.LostItem;
 import com.codepath.nurivan.lostandfound.models.Match;
+import com.codepath.nurivan.lostandfound.models.Meeting;
 import com.parse.FunctionCallback;
 import com.parse.GetCallback;
 import com.parse.ParseCloud;
@@ -28,6 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -139,7 +144,10 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
                             return;
                         }
                         try {
-                            showSendEmailActivity(emailAddress);
+                            Meeting meeting = new Meeting();
+                            meeting.setEmailAddress(emailAddress);
+                            meeting.setItem(item);
+                            showChooseMeetingPlace(meeting);
                         } catch (JSONException ex) {
                             ex.printStackTrace();
                         }
@@ -153,21 +161,69 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
             }
         }
 
-        private void showSendEmailActivity(String emailAddress) throws JSONException {
+        private void showChooseMeetingPlace(Meeting meeting) throws JSONException {
             JSONArray meetingPlaces = match.getMeetingPlaces();
-            StringBuilder emailString = new StringBuilder("Suggested meeting places: ");
+            HashMap<String, String> nameAddressMap = new HashMap<>();
             for(int i = 0; i < meetingPlaces.length(); i++) {
                 JSONObject meetingPlace = meetingPlaces.getJSONObject(i);
-                emailString.append("\n    Name: ").append(meetingPlace.getString("locationName"));
-                emailString.append("\n    Address: ").append(meetingPlace.getString("address")).append('\n');
+                nameAddressMap.put(meetingPlace.getString("locationName"), meetingPlace.getString("address"));
             }
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle("Pick a meeting place");
+            String[] items = nameAddressMap.keySet().toArray(new String[0]);
+            builder.setItems(items, (dialog, which) -> {
+                meeting.setLocationName(items[which]);
+                meeting.setLocationAddress(nameAddressMap.get(items[which]));
+                showChooseMeetingDate(meeting);
+            });
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+
+        private void showChooseMeetingDate(Meeting meeting) {
+            DatePickerDialog datePicker = new DatePickerDialog(context);
+            datePicker.setTitle("Pick a meeting date");
+            datePicker.getDatePicker().setMinDate(System.currentTimeMillis());
+
+            datePicker.setOnDateSetListener((view, year, month, dayOfMonth) -> {
+                Calendar meetingDate = Calendar.getInstance();
+                meetingDate.set(year, month, dayOfMonth);
+                meeting.setMeetingTime(meetingDate);
+
+                showChooseMeetingTime(meeting);
+            });
+
+            datePicker.show();
+        }
+
+        private void showChooseMeetingTime(Meeting meeting) {
+            TimePickerDialog.OnTimeSetListener listener = (view, hourOfDay, minute) -> {
+                Calendar meetingTime = meeting.getMeetingTime();
+                meetingTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                meetingTime.set(Calendar.MINUTE, minute);
+
+                try {
+                    showSendEmailActivity(meeting);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            };
+            TimePickerDialog timePickerDialog = new TimePickerDialog(context, listener, 0, 0, false);
+            timePickerDialog.setTitle("Pick a meeting time");
+
+            timePickerDialog.show();
+        }
+
+        private void showSendEmailActivity(Meeting meeting) throws JSONException {
             Intent emailIntent = new Intent(Intent.ACTION_SEND);
-            emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{ emailAddress });
+            String emailString = meeting.makeEmailText();
+            emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{ meeting.getEmailAddress() });
             emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Lost and Found Item");
-            emailIntent.putExtra(Intent.EXTRA_TEXT, emailString.toString());
+            emailIntent.putExtra(Intent.EXTRA_TEXT, emailString);
 
             emailIntent.setType("message/rfc822");
-            context.startActivity(Intent.createChooser(emailIntent, "Choose an Email client :"));
+            context.startActivity(Intent.createChooser(emailIntent, "Choose an Email client"));
         }
 
         private void showOwnershipVerificationActivity() {
