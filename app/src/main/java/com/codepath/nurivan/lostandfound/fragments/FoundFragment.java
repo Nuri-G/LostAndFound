@@ -60,6 +60,13 @@ public class FoundFragment extends Fragment {
         itemTouchHelper.attachToRecyclerView(binding.rvFoundItems);
 
         binding.swipeRefreshFound.setOnRefreshListener(this::getFoundItems);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        binding.swipeRefreshFound.setRefreshing(false);
 
         String currentUserId = ParseUser.getCurrentUser().getObjectId();
         if(items.isEmpty() || !lastUserId.equals(currentUserId)) {

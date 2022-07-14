@@ -60,6 +60,14 @@ public class LostFragment extends Fragment {
         itemTouchHelper.attachToRecyclerView(binding.rvLostItems);
 
         binding.swipeRefreshLost.setOnRefreshListener(this::getLostItems);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        binding.swipeRefreshLost.setRefreshing(false);
+
         String currentUserId = ParseUser.getCurrentUser().getObjectId();
         if(items.isEmpty() || !lastUserId.equals(currentUserId)) {
             lastUserId = currentUserId;
