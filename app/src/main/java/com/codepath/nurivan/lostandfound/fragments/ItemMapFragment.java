@@ -3,12 +3,16 @@ package com.codepath.nurivan.lostandfound.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 
 import com.codepath.nurivan.lostandfound.R;
@@ -29,18 +33,23 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseGeoPoint;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class ItemMapFragment extends Fragment implements GoogleMap.OnMapClickListener, OnMapReadyCallback {
     private final HashMap<Marker, Item> markerItems = new HashMap<>();
 
     private Context context;
+    private FragmentItemMapBinding binding;
 
     private final LostFragment lostFragment;
     private final FoundFragment foundFragment;
     private GoogleMap googleMap;
+    private Marker lastClickMarker;
 
     public ItemMapFragment(LostFragment lostFragment, FoundFragment foundFragment) {
         this.lostFragment = lostFragment;
@@ -50,7 +59,7 @@ public class ItemMapFragment extends Fragment implements GoogleMap.OnMapClickLis
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        com.codepath.nurivan.lostandfound.databinding.FragmentItemMapBinding binding = FragmentItemMapBinding.inflate(inflater, container, false);
+        binding = FragmentItemMapBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
@@ -70,7 +79,6 @@ public class ItemMapFragment extends Fragment implements GoogleMap.OnMapClickLis
 
     @Override
     public void onMapClick(@NonNull LatLng point) {
-
     }
 
     @Override
@@ -104,6 +112,50 @@ public class ItemMapFragment extends Fragment implements GoogleMap.OnMapClickLis
             Intent i = new Intent(getContext(), ItemDetailsActivity.class);
             i.putExtra(Item.class.getSimpleName(), markerItems.get(marker));
             startActivity(i);
+        });
+
+        binding.svMap.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                Optional<Map.Entry<Marker, Item>> itemSearch = markerItems.entrySet().stream().filter(markerItemEntry -> markerItemEntry.getValue().getItemName().equalsIgnoreCase(query)).findFirst();
+
+                if(itemSearch.isPresent()) {
+                    LatLng position = itemSearch.get().getKey().getPosition();
+
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 18));
+                    return false;
+                }
+
+
+                String location = binding.svMap.getQuery().toString();
+                location = location.trim();
+
+                if(!location.isEmpty()) {
+                    try {
+                        Geocoder geocoder = new Geocoder(context);
+                        List<Address> addressList = geocoder.getFromLocationName(location, 1);
+                        if(addressList.isEmpty()) {
+                            Toast.makeText(context, "Please enter a valid location.", Toast.LENGTH_SHORT).show();
+                            return false;
+                        }
+                        Address address = addressList.get(0);
+
+                        LatLng point = new LatLng(address.getLatitude(), address.getLongitude());
+
+                        onMapClick(point);
+
+                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 10));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
         });
     }
 
