@@ -1,5 +1,6 @@
 package com.codepath.nurivan.lostandfound.fragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -17,6 +18,7 @@ import androidx.fragment.app.Fragment;
 
 import com.codepath.nurivan.lostandfound.R;
 import com.codepath.nurivan.lostandfound.activities.ItemDetailsActivity;
+import com.codepath.nurivan.lostandfound.activities.ItemNameActivity;
 import com.codepath.nurivan.lostandfound.databinding.FragmentItemMapBinding;
 import com.codepath.nurivan.lostandfound.models.FoundItem;
 import com.codepath.nurivan.lostandfound.models.Item;
@@ -65,10 +67,7 @@ public class ItemMapFragment extends Fragment implements GoogleMap.OnMapClickLis
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.fcvMap);
 
-        assert mapFragment != null;
-        mapFragment.getMapAsync(this);
     }
 
     @Override
@@ -79,11 +78,34 @@ public class ItemMapFragment extends Fragment implements GoogleMap.OnMapClickLis
 
     @Override
     public void onMapClick(@NonNull LatLng point) {
+        MarkerOptions options = new MarkerOptions();
+        options.title("Add new item?");
+        options.snippet("Tap here");
+        options.position(point);
+        if(lastClickMarker != null) {
+            lastClickMarker.remove();
+        }
+        lastClickMarker = googleMap.addMarker(options);
+        if(lastClickMarker != null) {
+            lastClickMarker.showInfoWindow();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.fcvMap);
+
+        assert mapFragment != null;
+        mapFragment.getMapAsync(this);
     }
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         this.googleMap = googleMap;
+
+        setMapPins();
 
         googleMap.setOnMapClickListener(this);
         googleMap.setMaxZoomPreference(18);
@@ -100,8 +122,6 @@ public class ItemMapFragment extends Fragment implements GoogleMap.OnMapClickLis
                 break;
         }
 
-        setMapPins();
-
         googleMap.setOnMarkerClickListener(marker -> {
             googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 15));
             marker.showInfoWindow();
@@ -109,9 +129,34 @@ public class ItemMapFragment extends Fragment implements GoogleMap.OnMapClickLis
         });
 
         googleMap.setOnInfoWindowClickListener(marker -> {
-            Intent i = new Intent(getContext(), ItemDetailsActivity.class);
-            i.putExtra(Item.class.getSimpleName(), markerItems.get(marker));
-            startActivity(i);
+            if(markerItems.containsKey(marker)) {
+                Intent i = new Intent(getContext(), ItemDetailsActivity.class);
+                i.putExtra(Item.class.getSimpleName(), markerItems.get(marker));
+                startActivity(i);
+            } else {
+                AlertDialog.Builder itemTypeBuilder = new AlertDialog.Builder(context);
+                itemTypeBuilder.setTitle("Did you lose or find the item?");
+                LatLng pos = marker.getPosition();
+
+                itemTypeBuilder.setPositiveButton("Find", (dialog, which) -> {
+                    Item foundItem = new FoundItem();
+                    foundItem.setItemLocation(new ParseGeoPoint(pos.latitude, pos.longitude));
+                    showItemNameActivity(foundItem);
+                });
+                itemTypeBuilder.setNegativeButton("Lose", (dialog, which) -> {
+                    Item lostItem = new LostItem();
+                    lostItem.setItemLocation(new ParseGeoPoint(pos.latitude, pos.longitude));
+                    showItemNameActivity(lostItem);
+                });
+                itemTypeBuilder.setNeutralButton("Cancel", ((dialog, which) -> {
+
+                }));
+
+                lastClickMarker.remove();
+
+                itemTypeBuilder.create().show();
+            }
+
         });
 
         binding.svMap.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -157,6 +202,13 @@ public class ItemMapFragment extends Fragment implements GoogleMap.OnMapClickLis
                 return false;
             }
         });
+    }
+
+    private void showItemNameActivity(Item item) {
+        Intent i = new Intent(getActivity(), ItemNameActivity.class);
+        i.putExtra(Item.class.getSimpleName(), item);
+
+        startActivity(i);
     }
 
     public void setMapPins() {

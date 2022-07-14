@@ -75,22 +75,31 @@ public class ItemLocationActivity extends AppCompatActivity implements OnMapRead
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
 
+        if(item.getItemLocation() != null) {
+            updateItem(item);
+        }
+
         binding.bFind.setOnClickListener(v -> updateItem(item));
     }
 
     private void updateItem(Item item) {
-        if(mapMarker == null) {
+        if(mapMarker == null && item.getItemLocation() == null) {
             Toast.makeText(this, "Tap to place a map marker.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        LatLng markerPosition = mapMarker.getPosition();
-        ParseGeoPoint parseGeoPoint = new ParseGeoPoint(markerPosition.latitude, markerPosition.longitude);
-        item.setItemLocation(parseGeoPoint);
+        ParseGeoPoint parseGeoPoint;
+        if(item.getItemLocation() != null) {
+            parseGeoPoint = item.getItemLocation();
+        } else {
+            LatLng markerPosition = mapMarker.getPosition();
+            parseGeoPoint = new ParseGeoPoint(markerPosition.latitude, markerPosition.longitude);
+            item.setItemLocation(parseGeoPoint);
+        }
 
         List<Address> addressList = null;
         try {
-            addressList = geocoder.getFromLocation(markerPosition.latitude, markerPosition.longitude, 1);
+            addressList = geocoder.getFromLocation(parseGeoPoint.getLatitude(), parseGeoPoint.getLongitude(), 1);
         } catch (IOException e) {
             e.printStackTrace();
         }
