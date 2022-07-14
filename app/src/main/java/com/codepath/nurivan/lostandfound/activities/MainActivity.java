@@ -1,12 +1,10 @@
 package com.codepath.nurivan.lostandfound.activities;
 
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -14,29 +12,15 @@ import androidx.fragment.app.FragmentManager;
 import com.codepath.nurivan.lostandfound.R;
 import com.codepath.nurivan.lostandfound.databinding.ActivityMainBinding;
 import com.codepath.nurivan.lostandfound.fragments.FoundFragment;
+import com.codepath.nurivan.lostandfound.fragments.ItemMapFragment;
 import com.codepath.nurivan.lostandfound.fragments.LostFragment;
 import com.codepath.nurivan.lostandfound.fragments.ProfileFragment;
 import com.codepath.nurivan.lostandfound.models.FoundItem;
 import com.codepath.nurivan.lostandfound.models.Item;
 import com.codepath.nurivan.lostandfound.models.LostItem;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.MapStyleOptions;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MainActivity extends AppCompatActivity {
     public static final String TAG = "MainActivity";
 
     private FragmentManager fragmentManager;
@@ -44,11 +28,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private final Fragment lostFragment = new LostFragment();
     private final Fragment foundFragment = new FoundFragment();
     private final Fragment profileFragment = new ProfileFragment();
-    private final Fragment mapFragment = SupportMapFragment.newInstance();
-    private final HashMap<Marker, Item> markerItems = new HashMap<>();
+    private final Fragment mapFragment = new ItemMapFragment((LostFragment) lostFragment, (FoundFragment) foundFragment);
 
     private Fragment currentFragment;
-    private GoogleMap googleMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +54,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 currentFragment = profileFragment;
             } else if(itemId == R.id.action_map) {
                 currentFragment = mapFragment;
-                ((SupportMapFragment) mapFragment).getMapAsync(this);
             } else {
                 return true;
             }
@@ -89,37 +70,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.i(TAG, "Current User: " + ParseUser.getCurrentUser().getUsername());
     }
 
-    private void setMapPins() {
-        googleMap.clear();
-        List<Item> allItems = new ArrayList<>();
-        allItems.addAll(((LostFragment) lostFragment).getItemList());
-        allItems.addAll(((FoundFragment) foundFragment).getItemList());
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        for(Item item : allItems) {
-            MarkerOptions options = new MarkerOptions();
-            options.title(item.getItemName());
-            options.snippet(Item.formatItemCoordinates(item.getItemLocation()));
-            ParseGeoPoint location = item.getItemLocation();
-            LatLng point = new LatLng(location.getLatitude(), location.getLongitude());
-            builder.include(point);
-            options.position(point);
-            if(item instanceof LostItem) {
-                options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-            } else if(item instanceof FoundItem) {
-                options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-            }
-
-            Marker m = googleMap.addMarker(options);
-            markerItems.put(m, item);
-        }
-
-        if(!allItems.isEmpty()) {
-            LatLngBounds bounds = builder.build();
-
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 80));
-        }
-    }
-
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -132,42 +82,5 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 ((FoundFragment) foundFragment).addFoundItem((FoundItem) item);
             }
         }
-
-        if(currentFragment == mapFragment && googleMap != null) {
-            setMapPins();
-        }
-    }
-
-    @Override
-    public void onMapReady(@NonNull GoogleMap googleMap) {
-        this.googleMap = googleMap;
-
-        googleMap.setMaxZoomPreference(18);
-
-        //Making the map dark if it is night mode
-        int nightModeFlags = getResources().getConfiguration().uiMode &
-                        Configuration.UI_MODE_NIGHT_MASK;
-        switch (nightModeFlags) {
-            case Configuration.UI_MODE_NIGHT_YES:
-                googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_night));
-                break;
-
-            case Configuration.UI_MODE_NIGHT_NO:
-                break;
-        }
-
-        setMapPins();
-
-        googleMap.setOnMarkerClickListener(marker -> {
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 15));
-            marker.showInfoWindow();
-            return true;
-        });
-
-        googleMap.setOnInfoWindowClickListener(marker -> {
-            Intent i = new Intent(MainActivity.this, ItemDetailsActivity.class);
-            i.putExtra(Item.class.getSimpleName(), markerItems.get(marker));
-            startActivity(i);
-        });
     }
 }
