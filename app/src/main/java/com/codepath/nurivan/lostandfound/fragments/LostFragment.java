@@ -95,7 +95,6 @@ public class LostFragment extends Fragment {
         }
         ParseQuery<LostItem> query = ParseQuery.getQuery(LostItem.class);
         query.whereEqualTo(LostItem.KEY_LOST_BY, ParseUser.getCurrentUser());
-        query.setLimit(20);
         query.findInBackground((objects, e) -> {
             if(e != null) {
                 Log.e(TAG, "Error getting lost items", e);

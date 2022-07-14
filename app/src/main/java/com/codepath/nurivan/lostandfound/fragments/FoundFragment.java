@@ -95,7 +95,6 @@ public class FoundFragment extends Fragment {
         }
         ParseQuery<FoundItem> query = ParseQuery.getQuery(FoundItem.class);
         query.whereEqualTo(FoundItem.KEY_FOUND_BY, ParseUser.getCurrentUser());
-        query.setLimit(20);
         query.findInBackground((objects, e) -> {
             if(e != null) {
                 Log.e(TAG, "Error getting found items", e);
