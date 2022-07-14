@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -73,17 +74,16 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
     private void updateItemDetails() {
         ParseQuery<Item> query = ParseQuery.getQuery(Item.class.getSimpleName());
         query.whereEqualTo("objectId", item.getObjectId());
-        query.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
+        query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ELSE_CACHE);
         query.findInBackground((objects, e) -> {
             if(e != null) {
                 Log.e(TAG, "Error fetching item.", e);
-            } else {
-                if(objects.size() > 0) {
-                    item = objects.get(0);
-                }
-                displayItemDetails();
+                Toast.makeText(ItemDetailsActivity.this, "Error fetching item.", Toast.LENGTH_SHORT).show();
+            } else if(objects.size() > 0) {
+                item = objects.get(0);
             }
             if(binding != null) {
+                displayItemDetails();
                 binding.swipeRefreshMatches.setRefreshing(false);
             }
         });

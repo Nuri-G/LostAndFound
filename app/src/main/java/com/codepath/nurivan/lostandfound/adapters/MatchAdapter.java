@@ -64,18 +64,19 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
         }
 
         ParseQuery<Match> matchQuery = ParseQuery.getQuery(Match.class.getSimpleName());
-        matchQuery.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
+        matchQuery.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ELSE_CACHE);
         matchQuery.whereContainedIn("objectId", matchIds);
         matchQuery.findInBackground((objects, e) -> {
             if(e != null) {
-                Log.e(TAG, "Error getting matches", e);
-                return;
+                Log.e(TAG, "Error fetching matches", e);
+                Toast.makeText(context, "Error fetching matches.", Toast.LENGTH_SHORT).show();
+            } else {
+                int size = matches.size();
+                matches.clear();
+                notifyItemRangeRemoved(0, size);
+                matches.addAll(objects);
+                notifyItemRangeInserted(0, matches.size());
             }
-            int size = matches.size();
-            matches.clear();
-            notifyItemRangeRemoved(0, size);
-            matches.addAll(objects);
-            notifyItemRangeInserted(0, matches.size());
         });
     }
 
@@ -114,10 +115,8 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
             FindCallback<Item> callback = (items, e) -> {
                 if(e != null) {
                     Log.e(TAG, "Error binding match.", e);
-                    return;
-                }
-
-                if(items.size() > 0) {
+                    Toast.makeText(context, "Error binding match.", Toast.LENGTH_SHORT).show();
+                } else if(items.size() > 0) {
                     Item otherItem = items.get(0);
 
                     binding.tvOtherItemName.setText(formatItemName(otherItem.getItemName()));

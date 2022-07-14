@@ -21,7 +21,7 @@ public class Match extends ParseObject {
     public void getLostItem(FindCallback<Item> callback) {
         ParseQuery<Item> lostItemQuery = ParseQuery.getQuery(LostItem.class.getSimpleName());
         lostItemQuery.whereEqualTo("objectId", Objects.requireNonNull(getParseObject(KEY_LOST_ITEM)).getObjectId());
-        lostItemQuery.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
+        lostItemQuery.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ELSE_CACHE);
 
         lostItemQuery.findInBackground(callback);
     }
@@ -29,7 +29,7 @@ public class Match extends ParseObject {
     public void getFoundItem(FindCallback<Item> callback) {
         ParseQuery<Item> foundItemQuery = ParseQuery.getQuery(FoundItem.class.getSimpleName());
         foundItemQuery.whereEqualTo("objectId", Objects.requireNonNull(getParseObject(KEY_FOUND_ITEM)).getObjectId());
-        foundItemQuery.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
+        foundItemQuery.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ELSE_CACHE);
 
         foundItemQuery.findInBackground(callback);
     }

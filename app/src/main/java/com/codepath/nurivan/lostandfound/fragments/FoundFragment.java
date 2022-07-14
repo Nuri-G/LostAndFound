@@ -1,17 +1,18 @@
 package com.codepath.nurivan.lostandfound.fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
-
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.codepath.nurivan.lostandfound.activities.ItemNameActivity;
 import com.codepath.nurivan.lostandfound.adapters.ItemAdapter;
@@ -94,11 +95,15 @@ public class FoundFragment extends Fragment {
             binding.swipeRefreshFound.setRefreshing(true);
         }
         ParseQuery<FoundItem> query = ParseQuery.getQuery(FoundItem.class);
-        query.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
+        query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ELSE_CACHE);
         query.whereEqualTo(FoundItem.KEY_FOUND_BY, ParseUser.getCurrentUser());
         query.findInBackground((objects, e) -> {
             if(e != null) {
-                Log.e(TAG, "Error getting found items", e);
+                Log.e(TAG, "Error getting found items.", e);
+                Context context = getContext();
+                if(context != null) {
+                    Toast.makeText(context, "Error getting found items.", Toast.LENGTH_SHORT).show();
+                }
             } else {
                 items.clear();
                 items.addAll(objects);
