@@ -1,10 +1,13 @@
 package com.codepath.nurivan.lostandfound.models;
 
-import com.parse.GetCallback;
+import com.parse.FindCallback;
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 import org.json.JSONArray;
+
+import java.util.Objects;
 
 @ParseClassName("Match")
 public class Match extends ParseObject {
@@ -15,18 +18,20 @@ public class Match extends ParseObject {
     public static final String KEY_VERIFIED = "verified";
     private static final String KEY_MEETING_PLACES = "meetingPlaces";
 
-    public void getLostItem(GetCallback<Item> callback) {
-        ParseObject lostItem = getParseObject(KEY_LOST_ITEM);
+    public void getLostItem(FindCallback<Item> callback) {
+        ParseQuery<Item> lostItemQuery = ParseQuery.getQuery(LostItem.class.getSimpleName());
+        lostItemQuery.whereEqualTo("objectId", Objects.requireNonNull(getParseObject(KEY_LOST_ITEM)).getObjectId());
+        lostItemQuery.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
 
-        assert lostItem != null;
-        lostItem.fetchInBackground(callback);
+        lostItemQuery.findInBackground(callback);
     }
 
-    public void getFoundItem(GetCallback<Item> callback) {
-        ParseObject foundItem = getParseObject(KEY_FOUND_ITEM);
+    public void getFoundItem(FindCallback<Item> callback) {
+        ParseQuery<Item> foundItemQuery = ParseQuery.getQuery(FoundItem.class.getSimpleName());
+        foundItemQuery.whereEqualTo("objectId", Objects.requireNonNull(getParseObject(KEY_FOUND_ITEM)).getObjectId());
+        foundItemQuery.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
 
-        assert foundItem != null;
-        foundItem.fetchInBackground(callback);
+        foundItemQuery.findInBackground(callback);
     }
 
     public Number getMatchScore() {

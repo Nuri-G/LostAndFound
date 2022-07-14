@@ -94,14 +94,15 @@ public class FoundFragment extends Fragment {
             binding.swipeRefreshFound.setRefreshing(true);
         }
         ParseQuery<FoundItem> query = ParseQuery.getQuery(FoundItem.class);
+        query.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
         query.whereEqualTo(FoundItem.KEY_FOUND_BY, ParseUser.getCurrentUser());
         query.findInBackground((objects, e) -> {
             if(e != null) {
                 Log.e(TAG, "Error getting found items", e);
-                return;
+            } else {
+                items.clear();
+                items.addAll(objects);
             }
-            items.clear();
-            items.addAll(objects);
             if(binding != null) {
                 binding.swipeRefreshFound.setRefreshing(false);
                 adapter.notifyDataSetChanged();

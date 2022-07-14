@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +18,7 @@ import com.codepath.nurivan.lostandfound.databinding.ActivityItemDetailsBinding;
 import com.codepath.nurivan.lostandfound.models.FoundItem;
 import com.codepath.nurivan.lostandfound.models.Item;
 import com.codepath.nurivan.lostandfound.models.LostItem;
+import com.parse.ParseQuery;
 
 public class ItemDetailsActivity extends AppCompatActivity implements DefaultLifecycleObserver {
     public static final String TAG = "ItemDetailsActivity";
@@ -59,7 +59,7 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
 
     @Override
     public void onResume(@NonNull LifecycleOwner owner) {
-        displayItemDetails();
+        updateItemDetails();
     }
 
     @Override
@@ -71,14 +71,21 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
     }
 
     private void updateItemDetails() {
-        item.fetchInBackground((object, e) -> {
+        ParseQuery<Item> query = ParseQuery.getQuery(Item.class.getSimpleName());
+        query.whereEqualTo("objectId", item.getObjectId());
+        query.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
+        query.findInBackground((objects, e) -> {
             if(e != null) {
-                Toast.makeText(ItemDetailsActivity.this, "Failed to get item.", Toast.LENGTH_SHORT).show();
                 Log.e(TAG, "Error fetching item.", e);
-                return;
+            } else {
+                if(objects.size() > 0) {
+                    item = objects.get(0);
+                }
+                displayItemDetails();
             }
-
-            displayItemDetails();
+            if(binding != null) {
+                binding.swipeRefreshMatches.setRefreshing(false);
+            }
         });
     }
 
@@ -98,8 +105,5 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
         binding.tvItemNameDetails.setText(formatItemName(item.getItemName()));
         binding.tvItemLocation.setText(item.getItemAddress());
         adapter.loadMatches(item);
-        if(binding != null) {
-            binding.swipeRefreshMatches.setRefreshing(false);
-        }
     }
 }

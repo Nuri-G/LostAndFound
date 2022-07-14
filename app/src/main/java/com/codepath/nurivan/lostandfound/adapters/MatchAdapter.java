@@ -23,9 +23,10 @@ import com.codepath.nurivan.lostandfound.models.Item;
 import com.codepath.nurivan.lostandfound.models.LostItem;
 import com.codepath.nurivan.lostandfound.models.Match;
 import com.codepath.nurivan.lostandfound.models.Meeting;
+import com.parse.FindCallback;
 import com.parse.FunctionCallback;
-import com.parse.GetCallback;
 import com.parse.ParseCloud;
+import com.parse.ParseQuery;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,28 +53,30 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
 
     public void loadMatches(Item item) {
         this.item = item;
-        notifyItemRangeRemoved(0, matches.size());
-        matches.clear();
         JSONArray matchesArray = item.getPossibleMatches();
-
+        List<String> matchIds = new ArrayList<>();
         for(int i = 0; i < matchesArray.length(); i++) {
             try {
-                String matchId = (String) matchesArray.get(i);
-                Match match = new Match();
-                match.setObjectId(matchId);
-                match.fetchInBackground((object, e) -> {
-                    if(e != null) {
-                        Log.e(TAG, "Failed to fetch match", e);
-                        return;
-                    }
-                    matches.add((Match) object);
-                    notifyItemInserted(matches.size() - 1);
-                });
-
+                matchIds.add(matchesArray.getString(i));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+
+        ParseQuery<Match> matchQuery = ParseQuery.getQuery(Match.class.getSimpleName());
+        matchQuery.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
+        matchQuery.whereContainedIn("objectId", matchIds);
+        matchQuery.findInBackground((objects, e) -> {
+            if(e != null) {
+                Log.e(TAG, "Error getting matches", e);
+                return;
+            }
+            int size = matches.size();
+            matches.clear();
+            notifyItemRangeRemoved(0, size);
+            matches.addAll(objects);
+            notifyItemRangeInserted(0, matches.size());
+        });
     }
 
     @NonNull
@@ -108,14 +111,18 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
         public void bind(Match match) {
             this.match = match;
 
-            GetCallback<Item> callback = (otherItem, e) -> {
+            FindCallback<Item> callback = (items, e) -> {
                 if(e != null) {
                     Log.e(TAG, "Error binding match.", e);
                     return;
                 }
 
-                binding.tvOtherItemName.setText(formatItemName(otherItem.getItemName()));
-                binding.tvCity.setText(otherItem.getItemAddress());
+                if(items.size() > 0) {
+                    Item otherItem = items.get(0);
+
+                    binding.tvOtherItemName.setText(formatItemName(otherItem.getItemName()));
+                    binding.tvCity.setText(otherItem.getItemAddress());
+                }
             };
             if(item instanceof LostItem) {
                 match.getFoundItem(callback);
