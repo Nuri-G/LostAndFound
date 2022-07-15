@@ -134,6 +134,7 @@ public class FoundFragment extends Fragment {
         items.add(item);
         if(adapter != null) {
             adapter.notifyItemInserted(items.size() - 1);
+            binding.tvEmptyMessageFound.setVisibility(View.GONE);
         }
     }
 
