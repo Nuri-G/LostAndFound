@@ -52,4 +52,6 @@
     <string name="edit">Edit</string>
     <string name="home_address_label">Home Address:</string>
     <string name="update_profile">Update Profile</string>
+    <string name="press_the_quot_quot_button_to_add_lost_items">Press the \"+\" button to add lost items.</string>
+    <string name="press_the_quot_quot_button_to_add_found_items">Press the \"+\" button to add found items.</string>
 </resources>

@@ -6,6 +6,16 @@
     android:layout_height="match_parent"
     tools:context=".fragments.LostFragment">
 
+    <TextView
+        android:id="@+id/tvEmptyMessageLost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:text="@string/press_the_quot_quot_button_to_add_lost_items"
+        android:visibility="gone"
+        app:layout_anchor="@+id/swipeRefreshLost"
+        app:layout_anchorGravity="top|center" />
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLost"
         android:layout_width="match_parent"

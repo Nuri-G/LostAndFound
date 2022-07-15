@@ -6,6 +6,16 @@
     android:layout_height="match_parent"
     tools:context=".fragments.FoundFragment">
 
+    <TextView
+        android:id="@+id/tvEmptyMessageFound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:text="@string/press_the_quot_quot_button_to_add_found_items"
+        android:visibility="gone"
+        app:layout_anchor="@+id/swipeRefreshFound"
+        app:layout_anchorGravity="top|center" />
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshFound"
         android:layout_width="match_parent"

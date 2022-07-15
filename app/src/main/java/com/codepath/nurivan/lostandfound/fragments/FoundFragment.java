@@ -109,8 +109,14 @@ public class FoundFragment extends Fragment {
                 items.addAll(objects);
             }
             if(binding != null) {
+                if(objects.isEmpty()) {
+                    binding.tvEmptyMessageFound.setVisibility(View.VISIBLE);
+                } else {
+                    binding.tvEmptyMessageFound.setVisibility(View.GONE);
+                }
                 binding.swipeRefreshFound.setRefreshing(false);
-                adapter.notifyDataSetChanged();
+                adapter.notifyItemRangeRemoved(0, adapter.getItemCount());
+                adapter.notifyItemRangeInserted(0, items.size());
             }
         });
     }

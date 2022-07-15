@@ -104,13 +104,19 @@ public class LostFragment extends Fragment {
                 if(context != null) {
                     Toast.makeText(context, "Error getting lost items.", Toast.LENGTH_SHORT).show();
                 }
-            } else if(objects != null) {
+            } else {
                 items.clear();
                 items.addAll(objects);
             }
             if(binding != null) {
+                if(objects.isEmpty()) {
+                    binding.tvEmptyMessageLost.setVisibility(View.VISIBLE);
+                } else {
+                    binding.tvEmptyMessageLost.setVisibility(View.GONE);
+                }
                 binding.swipeRefreshLost.setRefreshing(false);
-                adapter.notifyDataSetChanged();
+                adapter.notifyItemRangeRemoved(0, adapter.getItemCount());
+                adapter.notifyItemRangeInserted(0, items.size());
             }
         });
     }
