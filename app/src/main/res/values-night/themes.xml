@@ -13,6 +13,7 @@
         <item name="android:windowBackground">@color/backgroundColorDark</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/secondaryDarkColor</item>
+        <item name="android:textColor">@color/secondaryTextColor</item>
         <!-- Customize your theme here. -->
     </style>
 </resources>
