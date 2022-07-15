@@ -48,4 +48,8 @@
     <string name="finding_your_item">Finding your item.</string>
     <string name="map">Map</string>
     <string name="set_meeting">Set Meeting</string>
+    <string name="email_address_label">Email Address:</string>
+    <string name="edit">Edit</string>
+    <string name="home_address_label">Home Address:</string>
+    <string name="update_profile">Update Profile</string>
 </resources>
