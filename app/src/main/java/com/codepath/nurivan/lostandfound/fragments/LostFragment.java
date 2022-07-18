@@ -117,9 +117,6 @@ public class LostFragment extends Fragment {
             } else {
                 items.clear();
                 items.addAll(objects);
-                if(firstLoad) {
-                    getLostItems(false);
-                }
             }
             if(binding != null) {
                 if(objects != null && objects.isEmpty()) {
@@ -130,6 +127,9 @@ public class LostFragment extends Fragment {
                 binding.swipeRefreshLost.setRefreshing(false);
                 adapter.notifyItemRangeRemoved(0, adapter.getItemCount());
                 adapter.notifyItemRangeInserted(0, items.size());
+            }
+            if(firstLoad) {
+                getLostItems(false);
             }
         });
     }

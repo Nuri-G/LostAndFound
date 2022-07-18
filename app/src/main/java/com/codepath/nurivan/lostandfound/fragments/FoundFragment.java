@@ -116,9 +116,6 @@ public class FoundFragment extends Fragment {
             } else {
                 items.clear();
                 items.addAll(objects);
-                if(firstLoad) {
-                    getFoundItems(false);
-                }
             }
             if(binding != null) {
                 if(objects != null && objects.isEmpty()) {
@@ -129,6 +126,9 @@ public class FoundFragment extends Fragment {
                 binding.swipeRefreshFound.setRefreshing(false);
                 adapter.notifyItemRangeRemoved(0, adapter.getItemCount());
                 adapter.notifyItemRangeInserted(0, items.size());
+            }
+            if(firstLoad) {
+                getFoundItems(false);
             }
         });
     }
