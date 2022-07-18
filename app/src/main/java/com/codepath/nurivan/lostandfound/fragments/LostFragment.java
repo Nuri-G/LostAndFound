@@ -109,7 +109,7 @@ public class LostFragment extends Fragment {
                 items.addAll(objects);
             }
             if(binding != null) {
-                if(objects.isEmpty()) {
+                if(objects == null || objects.isEmpty()) {
                     binding.tvEmptyMessageLost.setVisibility(View.VISIBLE);
                 } else {
                     binding.tvEmptyMessageLost.setVisibility(View.GONE);
