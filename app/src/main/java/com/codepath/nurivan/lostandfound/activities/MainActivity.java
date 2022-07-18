@@ -8,6 +8,7 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.codepath.nurivan.lostandfound.R;
 import com.codepath.nurivan.lostandfound.databinding.ActivityMainBinding;
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private final Fragment mapFragment = new ItemMapFragment((LostFragment) lostFragment, (FoundFragment) foundFragment);
 
     private Fragment currentFragment;
+    private int menuPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,25 +42,41 @@ public class MainActivity extends AppCompatActivity {
         setContentView(view);
 
         fragmentManager = getSupportFragmentManager();
+        menuPosition = 0;
 
         binding.bottomNavigation.setOnItemSelectedListener(item -> {
-
-
             int itemId = item.getItemId();
+            int newPosition;
 
             if(itemId == R.id.action_lost) {
                 currentFragment = lostFragment;
+                newPosition = 0;
             } else if(itemId == R.id.action_found) {
                 currentFragment = foundFragment;
-            } else if(itemId == R.id.action_profile) {
-                currentFragment = profileFragment;
+                newPosition = 1;
             } else if(itemId == R.id.action_map) {
                 currentFragment = mapFragment;
-            } else {
+                newPosition = 2;
+            } else if(itemId == R.id.action_profile) {
+                currentFragment = profileFragment;
+                newPosition = 3;
+            }  else {
                 return true;
             }
 
-            fragmentManager.beginTransaction().replace(R.id.fragment_holder, currentFragment).commit();
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+            if(newPosition > menuPosition) {
+                transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
+            } else if(newPosition < menuPosition) {
+                transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+            }
+
+            menuPosition = newPosition;
+
+            transaction
+                    .replace(R.id.fragment_holder, currentFragment)
+                    .commit();
 
             return true;
         });
