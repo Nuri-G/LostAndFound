@@ -35,7 +35,7 @@ public class FoundFragment extends Fragment {
     private ItemAdapter adapter;
 
     public FoundFragment() {
-        getFoundItems();
+        getFoundItems(true);
     }
 
     @Override
@@ -61,6 +61,9 @@ public class FoundFragment extends Fragment {
         itemTouchHelper.attachToRecyclerView(binding.rvFoundItems);
 
         binding.swipeRefreshFound.setOnRefreshListener(this::getFoundItems);
+        if(items.isEmpty()) {
+            binding.tvEmptyMessageFound.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -70,7 +73,7 @@ public class FoundFragment extends Fragment {
         binding.swipeRefreshFound.setRefreshing(false);
 
         String currentUserId = ParseUser.getCurrentUser().getObjectId();
-        if(items.isEmpty() || !lastUserId.equals(currentUserId)) {
+        if(!lastUserId.equals(currentUserId)) {
             lastUserId = currentUserId;
             getFoundItems();
         }
@@ -90,26 +93,35 @@ public class FoundFragment extends Fragment {
         startActivity(i);
     }
 
-    private void getFoundItems() {
+    private void getFoundItems(boolean firstLoad) {
         if(binding != null) {
             binding.swipeRefreshFound.setRefreshing(true);
         }
         ParseQuery<FoundItem> query = ParseQuery.getQuery(FoundItem.class);
-        query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ELSE_CACHE);
+        if(firstLoad) {
+            query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ONLY);
+        } else {
+            query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ONLY);
+        }
         query.whereEqualTo(FoundItem.KEY_FOUND_BY, ParseUser.getCurrentUser());
         query.findInBackground((objects, e) -> {
             if(e != null) {
-                Log.e(TAG, "Error getting found items.", e);
-                Context context = getContext();
-                if(context != null) {
-                    Toast.makeText(context, "Error getting found items.", Toast.LENGTH_SHORT).show();
+                if(!firstLoad) {
+                    Log.e(TAG, "Error getting found items.", e);
+                    Context context = getContext();
+                    if(context != null) {
+                        Toast.makeText(context, "Error getting found items.", Toast.LENGTH_SHORT).show();
+                    }
                 }
             } else {
                 items.clear();
                 items.addAll(objects);
+                if(firstLoad) {
+                    getFoundItems(false);
+                }
             }
             if(binding != null) {
-                if(objects == null || objects.isEmpty()) {
+                if(objects != null && objects.isEmpty()) {
                     binding.tvEmptyMessageFound.setVisibility(View.VISIBLE);
                 } else {
                     binding.tvEmptyMessageFound.setVisibility(View.GONE);
@@ -119,6 +131,10 @@ public class FoundFragment extends Fragment {
                 adapter.notifyItemRangeInserted(0, items.size());
             }
         });
+    }
+
+    private void getFoundItems() {
+        getFoundItems(false);
     }
 
     public void addFoundItem(FoundItem item) {

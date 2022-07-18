@@ -35,7 +35,7 @@ public class LostFragment extends Fragment {
     private ItemAdapter adapter;
 
     public LostFragment() {
-        getLostItems();
+        getLostItems(true);
     }
 
     @Override
@@ -61,6 +61,9 @@ public class LostFragment extends Fragment {
         itemTouchHelper.attachToRecyclerView(binding.rvLostItems);
 
         binding.swipeRefreshLost.setOnRefreshListener(this::getLostItems);
+        if(items.isEmpty()) {
+            binding.tvEmptyMessageLost.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -70,7 +73,7 @@ public class LostFragment extends Fragment {
         binding.swipeRefreshLost.setRefreshing(false);
 
         String currentUserId = ParseUser.getCurrentUser().getObjectId();
-        if(items.isEmpty() || !lastUserId.equals(currentUserId)) {
+        if(!lastUserId.equals(currentUserId)) {
             lastUserId = currentUserId;
             getLostItems();
         }
@@ -90,26 +93,36 @@ public class LostFragment extends Fragment {
         startActivity(i);
     }
 
-    private void getLostItems() {
+    //Loads from cache if firstLoad is true.
+    private void getLostItems(boolean firstLoad) {
         if(binding != null) {
             binding.swipeRefreshLost.setRefreshing(true);
         }
         ParseQuery<LostItem> query = ParseQuery.getQuery(LostItem.class);
-        query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ELSE_CACHE);
+        if(firstLoad) {
+            query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ONLY);
+        } else {
+            query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ONLY);
+        }
         query.whereEqualTo(LostItem.KEY_LOST_BY, ParseUser.getCurrentUser());
         query.findInBackground((objects, e) -> {
             if(e != null) {
-                Log.e(TAG, "Error getting lost items.", e);
-                Context context = getContext();
-                if(context != null) {
-                    Toast.makeText(context, "Error getting lost items.", Toast.LENGTH_SHORT).show();
+                if(!firstLoad) {
+                    Log.e(TAG, "Error getting lost items.", e);
+                    Context context = getContext();
+                    if(context != null) {
+                        Toast.makeText(context, "Error getting lost items.", Toast.LENGTH_SHORT).show();
+                    }
                 }
             } else {
                 items.clear();
                 items.addAll(objects);
+                if(firstLoad) {
+                    getLostItems(false);
+                }
             }
             if(binding != null) {
-                if(objects == null || objects.isEmpty()) {
+                if(objects != null && objects.isEmpty()) {
                     binding.tvEmptyMessageLost.setVisibility(View.VISIBLE);
                 } else {
                     binding.tvEmptyMessageLost.setVisibility(View.GONE);
@@ -119,6 +132,10 @@ public class LostFragment extends Fragment {
                 adapter.notifyItemRangeInserted(0, items.size());
             }
         });
+    }
+
+    private void getLostItems() {
+        getLostItems(false);
     }
 
     public void addLostItem(LostItem item) {
