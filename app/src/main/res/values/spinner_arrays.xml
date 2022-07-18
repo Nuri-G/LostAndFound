@@ -15,6 +15,11 @@
         <item>Blue</item>
         <item>Indigo</item>
         <item>Violet</item>
+        <item>White</item>
+        <item>Gray</item>
+        <item>Black</item>
+        <item>Brown</item>
+        <item>Other</item>
     </string-array>
     <string-array name="patterns_array">
         <item>Solid</item>
