@@ -18,18 +18,26 @@ public class Match extends ParseObject {
     public static final String KEY_VERIFIED = "verified";
     private static final String KEY_MEETING_PLACES = "meetingPlaces";
 
-    public void getLostItem(FindCallback<Item> callback) {
+    public void getLostItem(FindCallback<Item> callback, boolean cached) {
         ParseQuery<Item> lostItemQuery = ParseQuery.getQuery(LostItem.class.getSimpleName());
         lostItemQuery.whereEqualTo("objectId", Objects.requireNonNull(getParseObject(KEY_LOST_ITEM)).getObjectId());
-        lostItemQuery.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ELSE_CACHE);
+        if(cached) {
+            lostItemQuery.setCachePolicy(ParseQuery.CachePolicy.CACHE_ONLY);
+        } else {
+            lostItemQuery.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ONLY);
+        }
 
         lostItemQuery.findInBackground(callback);
     }
 
-    public void getFoundItem(FindCallback<Item> callback) {
+    public void getFoundItem(FindCallback<Item> callback, boolean cached) {
         ParseQuery<Item> foundItemQuery = ParseQuery.getQuery(FoundItem.class.getSimpleName());
         foundItemQuery.whereEqualTo("objectId", Objects.requireNonNull(getParseObject(KEY_FOUND_ITEM)).getObjectId());
-        foundItemQuery.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ELSE_CACHE);
+        if(cached) {
+            foundItemQuery.setCachePolicy(ParseQuery.CachePolicy.CACHE_ONLY);
+        } else {
+            foundItemQuery.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ONLY);
+        }
 
         foundItemQuery.findInBackground(callback);
     }

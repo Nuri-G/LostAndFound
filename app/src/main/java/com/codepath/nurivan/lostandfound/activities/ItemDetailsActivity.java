@@ -23,7 +23,7 @@ import com.codepath.nurivan.lostandfound.models.FoundItem;
 import com.codepath.nurivan.lostandfound.models.Item;
 import com.codepath.nurivan.lostandfound.models.LostItem;
 import com.codepath.nurivan.lostandfound.models.Match;
-import com.parse.ParseQuery;
+import com.parse.GetCallback;
 
 import java.util.concurrent.TimeUnit;
 
@@ -84,7 +84,7 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
 
     @Override
     public void onResume(@NonNull LifecycleOwner owner) {
-        updateItemDetails();
+        displayItemDetails();
     }
 
     @Override
@@ -115,15 +115,10 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
     }
 
     private void updateItemDetails() {
-        ParseQuery<Item> query = ParseQuery.getQuery(Item.class.getSimpleName());
-        query.whereEqualTo("objectId", item.getObjectId());
-        query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ELSE_CACHE);
-        query.findInBackground((objects, e) -> {
+        item.fetchInBackground((GetCallback<Item>) (item, e) -> {
             if(e != null) {
                 Log.e(TAG, "Error fetching item.", e);
                 Toast.makeText(ItemDetailsActivity.this, "Error fetching item.", Toast.LENGTH_SHORT).show();
-            } else if(objects.size() > 0) {
-                item = objects.get(0);
             }
             if(binding != null) {
                 displayItemDetails();
@@ -148,5 +143,6 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
         binding.tvItemNameDetails.setText(formatItemName(item.getItemName()));
         binding.tvItemLocation.setText(item.getItemAddress());
         adapter.loadMatches(item);
+        binding.swipeRefreshMatches.setRefreshing(false);
     }
 }
