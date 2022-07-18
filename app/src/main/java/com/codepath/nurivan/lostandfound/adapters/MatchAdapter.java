@@ -7,6 +7,7 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.codepath.nurivan.lostandfound.activities.ItemDetailsActivity;
@@ -26,12 +28,22 @@ import com.codepath.nurivan.lostandfound.models.Meeting;
 import com.parse.FindCallback;
 import com.parse.FunctionCallback;
 import com.parse.ParseCloud;
+import com.parse.ParseException;
 import com.parse.ParseQuery;
+
+import net.fortuna.ical4j.data.CalendarOutputter;
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.property.CalScale;
+import net.fortuna.ical4j.model.property.Version;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -68,28 +80,30 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
         matchQuery.whereContainedIn("objectId", matchIds);
         matchQuery.findInBackground((objects, e) -> {
             if(e != null) {
-                Log.e(TAG, "Error fetching matches", e);
-                Toast.makeText(context, "Error fetching matches.", Toast.LENGTH_SHORT).show();
+                if(e.getCode() != ParseException.CACHE_MISS) {
+                    Log.e(TAG, "Error fetching matches", e);
+                    Toast.makeText(context, "Error fetching matches.", Toast.LENGTH_SHORT).show();
+                }
             } else {
                 int size = matches.size();
                 matches.clear();
                 notifyItemRangeRemoved(0, size);
                 matches.addAll(objects);
                 notifyItemRangeInserted(0, matches.size());
-                matchQuery.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ONLY);
-                matchQuery.findInBackground((objects1, e1) -> {
-                    if(e1 != null) {
-                        Log.e(TAG, "Error fetching matches", e1);
-                        Toast.makeText(context, "Error fetching matches.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        int size1 = matches.size();
-                        matches.clear();
-                        notifyItemRangeRemoved(0, size1);
-                        matches.addAll(objects1);
-                        notifyItemRangeInserted(0, matches.size());
-                    }
-                });
             }
+            matchQuery.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ONLY);
+            matchQuery.findInBackground((objects1, e1) -> {
+                if(e1 != null) {
+                    Log.e(TAG, "Error fetching matches", e1);
+                    Toast.makeText(context, "Error fetching matches.", Toast.LENGTH_SHORT).show();
+                } else {
+                    int size1 = matches.size();
+                    matches.clear();
+                    notifyItemRangeRemoved(0, size1);
+                    matches.addAll(objects1);
+                    notifyItemRangeInserted(0, matches.size());
+                }
+            });
         });
     }
 
@@ -138,18 +152,23 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
 
             FindCallback<Item> cachedCallback = (items, e) -> {
                 if(e != null) {
-                    Log.e(TAG, "Error binding match.", e);
-                    Toast.makeText(context, "Error binding match.", Toast.LENGTH_SHORT).show();
+                    if (e.getCode() != ParseException.CACHE_MISS) {
+                        Log.e(TAG, "Error binding match.", e);
+                        Toast.makeText(context, "Error binding match.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Error binding match.", Toast.LENGTH_SHORT).show();
+                    }
+
                 } else if(items.size() > 0) {
                     Item otherItem = items.get(0);
-                    if(item instanceof FoundItem) {
-                        match.getLostItem(networkCallback, false);
-                    } else if(item instanceof LostItem) {
-                        match.getFoundItem(networkCallback, false);
-                    }
 
                     binding.tvOtherItemName.setText(formatItemName(otherItem.getItemName()));
                     binding.tvCity.setText(otherItem.getItemAddress());
+                }
+
+                if(item instanceof FoundItem) {
+                    match.getLostItem(networkCallback, false);
+                } else if(item instanceof LostItem) {
+                    match.getFoundItem(networkCallback, false);
                 }
             };
             if(item instanceof LostItem) {
@@ -244,7 +263,7 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
 
                 try {
                     showSendEmailActivity(meeting);
-                } catch (JSONException e) {
+                } catch (JSONException | IOException e) {
                     e.printStackTrace();
                 }
             };
@@ -254,12 +273,29 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
             timePickerDialog.show();
         }
 
-        private void showSendEmailActivity(Meeting meeting) throws JSONException {
+        private void showSendEmailActivity(Meeting meeting) throws JSONException, IOException {
+            File f = new File(context.getCacheDir(), "meeting.ics");
+            FileOutputStream fileOutputStream = new FileOutputStream(f);
+
+            net.fortuna.ical4j.model.Calendar calendar = new net.fortuna.ical4j.model.Calendar();
+            calendar.getProperties().add(Version.VERSION_2_0);
+            calendar.getProperties().add(CalScale.GREGORIAN);
+
+            VEvent meetingEvent = new VEvent(new DateTime(meeting.getMeetingTime().getTime()), "Item exchange");
+            calendar.getComponents().add(meetingEvent);
+
+            CalendarOutputter calendarOutputter = new CalendarOutputter();
+            calendarOutputter.output(calendar, fileOutputStream);
+            fileOutputStream.close();
+            Uri path = FileProvider.getUriForFile(context, "com.codepath.fileprovider", f);
+
             Intent emailIntent = new Intent(Intent.ACTION_SEND);
             String emailString = meeting.makeEmailText();
+            emailIntent.putExtra(Intent.EXTRA_STREAM, path);
             emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{ meeting.getEmailAddress() });
             emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Lost and Found Item");
             emailIntent.putExtra(Intent.EXTRA_TEXT, emailString);
+            emailIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
             emailIntent.setType("message/rfc822");
             context.startActivity(Intent.createChooser(emailIntent, "Choose an Email client"));
