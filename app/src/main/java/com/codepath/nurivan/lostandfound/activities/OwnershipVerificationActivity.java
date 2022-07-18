@@ -1,5 +1,6 @@
 package com.codepath.nurivan.lostandfound.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -55,6 +56,9 @@ public class OwnershipVerificationActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Verification failed.", Toast.LENGTH_SHORT).show();
                 }
                 binding.pbLoadingResults.setVisibility(View.GONE);
+                Intent data = new Intent();
+                data.putExtra("passed", (Boolean) passed);
+                setResult(RESULT_OK, data);
                 finish();
             });
         });

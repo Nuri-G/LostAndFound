@@ -16,7 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.codepath.nurivan.lostandfound.activities.OwnershipVerificationActivity;
+import com.codepath.nurivan.lostandfound.activities.ItemDetailsActivity;
 import com.codepath.nurivan.lostandfound.databinding.MatchLayoutBinding;
 import com.codepath.nurivan.lostandfound.models.FoundItem;
 import com.codepath.nurivan.lostandfound.models.Item;
@@ -163,7 +163,11 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
                 binding.bVerify.setVisibility(View.GONE);
                 binding.tvVerification.setVisibility(View.VISIBLE);
             } else {
-                binding.bVerify.setOnClickListener(v -> showOwnershipVerificationActivity());
+                binding.bVerify.setOnClickListener(v -> {
+                    if(context instanceof ItemDetailsActivity) {
+                        ((ItemDetailsActivity) context).showOwnershipVerificationActivity(match);
+                    }
+                });
             }
         }
 
@@ -230,13 +234,6 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
 
             emailIntent.setType("message/rfc822");
             context.startActivity(Intent.createChooser(emailIntent, "Choose an Email client"));
-        }
-
-        private void showOwnershipVerificationActivity() {
-            Intent i = new Intent(context, OwnershipVerificationActivity.class);
-            i.putExtra(Match.class.getSimpleName(), match);
-
-            context.startActivity(i);
         }
     }
 }
