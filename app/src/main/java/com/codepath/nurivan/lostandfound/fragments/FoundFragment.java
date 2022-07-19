@@ -132,10 +132,10 @@ public class FoundFragment extends Fragment {
         query.findInBackground((objects, e) -> {
             if(e != null) {
                 if(!firstLoad) {
-                    Log.e(TAG, "Error getting lost items.", e);
+                    Log.e(TAG, "Error getting found items.", e);
                     Context context = getContext();
                     if(context != null) {
-                        Toast.makeText(context, "Error getting lost items.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Error getting found items.", Toast.LENGTH_SHORT).show();
                     }
                 }
             } else if(skip == 0){

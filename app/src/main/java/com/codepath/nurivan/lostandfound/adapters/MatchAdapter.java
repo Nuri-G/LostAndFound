@@ -78,7 +78,7 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
         }
 
         ParseQuery<Match> matchQuery = ParseQuery.getQuery(Match.class.getSimpleName());
-        matchQuery.setCachePolicy(ParseQuery.CachePolicy.CACHE_ONLY);
+        matchQuery.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
         matchQuery.whereContainedIn("objectId", matchIds);
         matchQuery.findInBackground((objects, e) -> {
             if(e != null) {
@@ -93,19 +93,6 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
                 matches.addAll(objects);
                 notifyItemRangeInserted(0, matches.size());
             }
-            matchQuery.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ONLY);
-            matchQuery.findInBackground((objects1, e1) -> {
-                if(e1 != null) {
-                    Log.e(TAG, "Error fetching matches", e1);
-                    Toast.makeText(context, "Error fetching matches.", Toast.LENGTH_SHORT).show();
-                } else {
-                    int size1 = matches.size();
-                    matches.clear();
-                    notifyItemRangeRemoved(0, size1);
-                    matches.addAll(objects1);
-                    notifyItemRangeInserted(0, matches.size());
-                }
-            });
         });
     }
 
@@ -141,22 +128,10 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
         public void bind(Match match) {
             this.match = match;
 
-            FindCallback<Item> networkCallback = (items, e) -> {
-                if(e != null) {
-                    Log.e(TAG, "Error binding match.", e);
-                    Toast.makeText(context, "Error binding match.", Toast.LENGTH_SHORT).show();
-                } else if(items.size() > 0) {
-                    Item otherItem = items.get(0);
-                    binding.tvOtherItemName.setText(formatItemName(otherItem.getItemName()));
-                    binding.tvCity.setText(otherItem.getItemAddress());
-                }
-            };
-
-            FindCallback<Item> cachedCallback = (items, e) -> {
+            FindCallback<Item> callback = (items, e) -> {
                 if(e != null) {
                     if (e.getCode() != ParseException.CACHE_MISS) {
                         Log.e(TAG, "Error binding match.", e);
-                        Toast.makeText(context, "Error binding match.", Toast.LENGTH_SHORT).show();
                         Toast.makeText(context, "Error binding match.", Toast.LENGTH_SHORT).show();
                     }
 
@@ -166,17 +141,12 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
                     binding.tvOtherItemName.setText(formatItemName(otherItem.getItemName()));
                     binding.tvCity.setText(otherItem.getItemAddress());
                 }
-
-                if(item instanceof FoundItem) {
-                    match.getLostItem(networkCallback, false);
-                } else if(item instanceof LostItem) {
-                    match.getFoundItem(networkCallback, false);
-                }
             };
+
             if(item instanceof LostItem) {
-                match.getFoundItem(cachedCallback, true);
+                match.getFoundItem(callback);
             } else if(item instanceof FoundItem) {
-                match.getLostItem(cachedCallback, true);
+                match.getLostItem(callback);
             }
             double distance = match.getDistanceMiles().doubleValue();
             double score = match.getMatchScore().doubleValue();
