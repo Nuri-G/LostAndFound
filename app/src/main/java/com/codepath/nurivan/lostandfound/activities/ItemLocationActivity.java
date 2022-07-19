@@ -75,7 +75,7 @@ public class ItemLocationActivity extends AppCompatActivity implements OnMapRead
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
 
-        if(item.getItemLocation() != null) {
+        if(item.getItemLocation() != null && item.getObjectId() == null) {
             updateItem(item);
         }
 
