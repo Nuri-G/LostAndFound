@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -52,7 +53,9 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         item.deleteInBackground(e -> {
             if(e != null) {
                 Log.e(TAG, "Failed to delete item", e);
+                return;
             }
+            Toast.makeText(context, "Item deleted.", Toast.LENGTH_SHORT).show();
         });
         items.remove(index);
         notifyItemRemoved(index);
@@ -130,8 +133,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
             int position = viewHolder.getAdapterPosition();
 
             Snackbar snackbar = Snackbar
-                    .make(layout, "Item was deleted.", Snackbar.LENGTH_SHORT);
-            snackbar.setAction("UNDO", view -> cancelDelete = true);
+                    .make(layout, "Deleting item.", Snackbar.LENGTH_SHORT);
+            snackbar.setAction("CANCEL", view -> cancelDelete = true);
 
             snackbar.addCallback(new Snackbar.Callback() {
                 @Override
