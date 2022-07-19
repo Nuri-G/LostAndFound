@@ -139,10 +139,11 @@ public class FoundFragment extends Fragment {
                     }
                 }
             } else if(skip == 0){
+                int size = adapter.getItemCount();
                 items.clear();
                 items.addAll(objects);
                 if(adapter != null) {
-                    adapter.notifyItemRangeRemoved(0, adapter.getItemCount());
+                    adapter.notifyItemRangeRemoved(0, size);
                     adapter.notifyItemRangeInserted(0, items.size());
                 }
             } else {
