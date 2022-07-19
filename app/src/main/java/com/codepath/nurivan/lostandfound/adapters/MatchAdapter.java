@@ -35,6 +35,8 @@ import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.CalScale;
+import net.fortuna.ical4j.model.property.Location;
+import net.fortuna.ical4j.model.property.Organizer;
 import net.fortuna.ical4j.model.property.Version;
 
 import org.json.JSONArray;
@@ -282,6 +284,7 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
             calendar.getProperties().add(CalScale.GREGORIAN);
 
             VEvent meetingEvent = new VEvent(new DateTime(meeting.getMeetingTime().getTime()), "Item exchange");
+            meetingEvent.getProperties().add(new Location(meeting.getLocationAddress()));
             calendar.getComponents().add(meetingEvent);
 
             CalendarOutputter calendarOutputter = new CalendarOutputter();
@@ -290,12 +293,12 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.ViewHolder> 
             Uri path = FileProvider.getUriForFile(context, "com.codepath.fileprovider", f);
 
             Intent emailIntent = new Intent(Intent.ACTION_SEND);
+            emailIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             String emailString = meeting.makeEmailText();
             emailIntent.putExtra(Intent.EXTRA_STREAM, path);
             emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{ meeting.getEmailAddress() });
-            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Lost and Found Item");
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Lost and Found Item Exchange");
             emailIntent.putExtra(Intent.EXTRA_TEXT, emailString);
-            emailIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
             emailIntent.setType("message/rfc822");
             context.startActivity(Intent.createChooser(emailIntent, "Choose an Email client"));
