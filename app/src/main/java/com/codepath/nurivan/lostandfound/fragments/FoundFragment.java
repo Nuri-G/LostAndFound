@@ -13,12 +13,13 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.codepath.nurivan.lostandfound.activities.ItemNameActivity;
 import com.codepath.nurivan.lostandfound.adapters.ItemAdapter;
 import com.codepath.nurivan.lostandfound.databinding.FragmentFoundBinding;
-import com.codepath.nurivan.lostandfound.models.FoundItem;
 import com.codepath.nurivan.lostandfound.models.Item;
+import com.codepath.nurivan.lostandfound.models.FoundItem;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
@@ -33,9 +34,11 @@ public class FoundFragment extends Fragment {
 
     private FragmentFoundBinding binding;
     private ItemAdapter adapter;
+    private boolean loading;
 
     public FoundFragment() {
-        getFoundItems(true);
+        loading = true;
+        getFoundItems(true, 0);
     }
 
     @Override
@@ -54,8 +57,26 @@ public class FoundFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         binding.bAdd.setOnClickListener(v -> showItemNameActivity());
-        binding.rvFoundItems.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        binding.rvFoundItems.setLayoutManager(layoutManager);
         binding.rvFoundItems.setAdapter(adapter);
+        binding.rvFoundItems.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                if (dy > 0) { //check for scroll down
+                    int visibleItemCount = layoutManager.getChildCount();
+                    int totalItemCount = layoutManager.getItemCount();
+                    int pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
+
+                    if(!loading) {
+                        if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
+                            loading = true;
+                            getFoundItems(false, totalItemCount);
+                        }
+                    }
+                }
+            }
+        });
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemAdapter.SwipeHelper(binding.getRoot(), adapter));
         itemTouchHelper.attachToRecyclerView(binding.rvFoundItems);
@@ -93,7 +114,8 @@ public class FoundFragment extends Fragment {
         startActivity(i);
     }
 
-    private void getFoundItems(boolean firstLoad) {
+    //Loads from cache if firstLoad is true.
+    private void getFoundItems(boolean firstLoad, int skip) {
         if(binding != null) {
             binding.swipeRefreshFound.setRefreshing(true);
         }
@@ -104,19 +126,33 @@ public class FoundFragment extends Fragment {
             query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ONLY);
         }
         query.whereEqualTo(FoundItem.KEY_FOUND_BY, ParseUser.getCurrentUser());
+        query.setSkip(skip);
+        int QUERY_LIMIT = 20;
+        query.setLimit(QUERY_LIMIT);
         query.findInBackground((objects, e) -> {
             if(e != null) {
                 if(!firstLoad) {
-                    Log.e(TAG, "Error getting found items.", e);
+                    Log.e(TAG, "Error getting lost items.", e);
                     Context context = getContext();
                     if(context != null) {
-                        Toast.makeText(context, "Error getting found items.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Error getting lost items.", Toast.LENGTH_SHORT).show();
                     }
                 }
-            } else {
+            } else if(skip == 0){
                 items.clear();
                 items.addAll(objects);
+                if(adapter != null) {
+                    adapter.notifyItemRangeRemoved(0, adapter.getItemCount());
+                    adapter.notifyItemRangeInserted(0, items.size());
+                }
+            } else {
+                int start = items.size();
+                items.addAll(objects);
+                if(adapter != null) {
+                    adapter.notifyItemRangeInserted(start, objects.size());
+                }
             }
+
             if(binding != null) {
                 if(objects != null && objects.isEmpty()) {
                     binding.tvEmptyMessageFound.setVisibility(View.VISIBLE);
@@ -124,17 +160,18 @@ public class FoundFragment extends Fragment {
                     binding.tvEmptyMessageFound.setVisibility(View.GONE);
                 }
                 binding.swipeRefreshFound.setRefreshing(false);
-                adapter.notifyItemRangeRemoved(0, adapter.getItemCount());
-                adapter.notifyItemRangeInserted(0, items.size());
             }
+
             if(firstLoad) {
-                getFoundItems(false);
+                getFoundItems(false, 0);
+            } else {
+                loading = false;
             }
         });
     }
 
     private void getFoundItems() {
-        getFoundItems(false);
+        getFoundItems(false, 0);
     }
 
     public void addFoundItem(FoundItem item) {

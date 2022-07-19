@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.codepath.nurivan.lostandfound.activities.ItemNameActivity;
 import com.codepath.nurivan.lostandfound.adapters.ItemAdapter;
@@ -33,9 +34,11 @@ public class LostFragment extends Fragment {
 
     private FragmentLostBinding binding;
     private ItemAdapter adapter;
+    private boolean loading;
 
     public LostFragment() {
-        getLostItems(true);
+        loading = true;
+        getLostItems(true, 0);
     }
 
     @Override
@@ -54,8 +57,26 @@ public class LostFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         binding.bAdd.setOnClickListener(v -> showItemNameActivity());
-        binding.rvLostItems.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        binding.rvLostItems.setLayoutManager(layoutManager);
         binding.rvLostItems.setAdapter(adapter);
+        binding.rvLostItems.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                if (dy > 0) { //check for scroll down
+                    int visibleItemCount = layoutManager.getChildCount();
+                    int totalItemCount = layoutManager.getItemCount();
+                    int pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
+
+                    if(!loading) {
+                        if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
+                            loading = true;
+                            getLostItems(false, totalItemCount);
+                        }
+                    }
+                }
+            }
+        });
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemAdapter.SwipeHelper(binding.getRoot(), adapter));
         itemTouchHelper.attachToRecyclerView(binding.rvLostItems);
@@ -94,7 +115,7 @@ public class LostFragment extends Fragment {
     }
 
     //Loads from cache if firstLoad is true.
-    private void getLostItems(boolean firstLoad) {
+    private void getLostItems(boolean firstLoad, int skip) {
         if(binding != null) {
             binding.swipeRefreshLost.setRefreshing(true);
         }
@@ -105,6 +126,9 @@ public class LostFragment extends Fragment {
             query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ONLY);
         }
         query.whereEqualTo(LostItem.KEY_LOST_BY, ParseUser.getCurrentUser());
+        query.setSkip(skip);
+        int QUERY_LIMIT = 20;
+        query.setLimit(QUERY_LIMIT);
         query.findInBackground((objects, e) -> {
             if(e != null) {
                 if(!firstLoad) {
@@ -114,10 +138,21 @@ public class LostFragment extends Fragment {
                         Toast.makeText(context, "Error getting lost items.", Toast.LENGTH_SHORT).show();
                     }
                 }
-            } else {
+            } else if(skip == 0){
                 items.clear();
                 items.addAll(objects);
+                if(adapter != null) {
+                    adapter.notifyItemRangeRemoved(0, adapter.getItemCount());
+                    adapter.notifyItemRangeInserted(0, items.size());
+                }
+            } else {
+                int start = items.size();
+                items.addAll(objects);
+                if(adapter != null) {
+                    adapter.notifyItemRangeInserted(start, objects.size());
+                }
             }
+
             if(binding != null) {
                 if(objects != null && objects.isEmpty()) {
                     binding.tvEmptyMessageLost.setVisibility(View.VISIBLE);
@@ -125,17 +160,18 @@ public class LostFragment extends Fragment {
                     binding.tvEmptyMessageLost.setVisibility(View.GONE);
                 }
                 binding.swipeRefreshLost.setRefreshing(false);
-                adapter.notifyItemRangeRemoved(0, adapter.getItemCount());
-                adapter.notifyItemRangeInserted(0, items.size());
             }
+
             if(firstLoad) {
-                getLostItems(false);
+                getLostItems(false, 0);
+            } else {
+                loading = false;
             }
         });
     }
 
     private void getLostItems() {
-        getLostItems(false);
+        getLostItems(false, 0);
     }
 
     public void addLostItem(LostItem item) {
