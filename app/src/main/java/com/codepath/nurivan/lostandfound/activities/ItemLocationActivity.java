@@ -171,7 +171,7 @@ public class ItemLocationActivity extends AppCompatActivity implements OnMapRead
         ParseGeoPoint location = item.getItemLocation();
         if(location != null) {
             LatLng point = new LatLng(location.getLatitude(), location.getLongitude());
-            CameraUpdate newPosition = CameraUpdateFactory.newCameraPosition(new CameraPosition(point, 4, 0, 0));
+            CameraUpdate newPosition = CameraUpdateFactory.newCameraPosition(new CameraPosition(point, 10, 0, 0));
             map.moveCamera(newPosition);
             onMapClick(point);
         }
