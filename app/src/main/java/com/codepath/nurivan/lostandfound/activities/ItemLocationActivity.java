@@ -89,7 +89,7 @@ public class ItemLocationActivity extends AppCompatActivity implements OnMapRead
         }
 
         ParseGeoPoint parseGeoPoint;
-        if(item.getItemLocation() != null) {
+        if(item.getItemLocation() != null && item.getObjectId() == null) {
             parseGeoPoint = item.getItemLocation();
         } else {
             LatLng markerPosition = mapMarker.getPosition();
