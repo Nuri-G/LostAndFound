@@ -140,6 +140,12 @@ public class ItemDetailsActivity extends AppCompatActivity implements DefaultLif
             binding.tvItemDateLabel.setText(FOUND_DATE_LABEL);
         }
 
+        if(item.getPossibleMatches().length() == 0) {
+            binding.tvEmptyMatches.setVisibility(View.VISIBLE);
+        } else {
+            binding.tvEmptyMatches.setVisibility(View.GONE);
+        }
+
         binding.tvItemNameDetails.setText(formatItemName(item.getItemName()));
         binding.tvItemLocation.setText(item.getItemAddress());
         adapter.loadMatches(item);
