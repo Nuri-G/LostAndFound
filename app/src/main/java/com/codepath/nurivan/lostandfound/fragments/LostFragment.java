@@ -139,7 +139,7 @@ public class LostFragment extends Fragment {
                     }
                 }
             } else if(skip == 0){
-                int size = adapter.getItemCount();
+                int size = items.size();
                 items.clear();
                 items.addAll(objects);
                 if(adapter != null) {
