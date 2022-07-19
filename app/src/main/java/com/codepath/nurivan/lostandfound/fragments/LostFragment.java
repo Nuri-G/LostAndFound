@@ -151,6 +151,8 @@ public class LostFragment extends Fragment {
         items.add(item);
         if(adapter != null) {
             adapter.notifyItemInserted(items.size() - 1);
+        }
+        if(binding != null) {
             binding.tvEmptyMessageLost.setVisibility(View.GONE);
         }
     }
