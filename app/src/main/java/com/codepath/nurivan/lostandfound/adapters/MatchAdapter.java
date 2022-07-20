@@ -36,7 +36,6 @@ import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Location;
-import net.fortuna.ical4j.model.property.Organizer;
 import net.fortuna.ical4j.model.property.Version;
 
 import org.json.JSONArray;
