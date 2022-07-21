@@ -48,12 +48,12 @@ public class ItemMapFragment extends Fragment implements GoogleMap.OnMapClickLis
     private Context context;
     private FragmentItemMapBinding binding;
 
-    private final LostFragment lostFragment;
-    private final FoundFragment foundFragment;
+    private final ItemFragment lostFragment;
+    private final ItemFragment foundFragment;
     private GoogleMap googleMap;
     private Marker lastClickMarker;
 
-    public ItemMapFragment(LostFragment lostFragment, FoundFragment foundFragment) {
+    public ItemMapFragment(ItemFragment lostFragment, ItemFragment foundFragment) {
         this.lostFragment = lostFragment;
         this.foundFragment = foundFragment;
     }

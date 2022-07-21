@@ -12,9 +12,8 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.codepath.nurivan.lostandfound.R;
 import com.codepath.nurivan.lostandfound.databinding.ActivityMainBinding;
-import com.codepath.nurivan.lostandfound.fragments.FoundFragment;
+import com.codepath.nurivan.lostandfound.fragments.ItemFragment;
 import com.codepath.nurivan.lostandfound.fragments.ItemMapFragment;
-import com.codepath.nurivan.lostandfound.fragments.LostFragment;
 import com.codepath.nurivan.lostandfound.fragments.ProfileFragment;
 import com.codepath.nurivan.lostandfound.models.FoundItem;
 import com.codepath.nurivan.lostandfound.models.Item;
@@ -26,10 +25,10 @@ public class MainActivity extends AppCompatActivity {
 
     private FragmentManager fragmentManager;
 
-    private final Fragment lostFragment = new LostFragment();
-    private final Fragment foundFragment = new FoundFragment();
+    private final Fragment lostFragment = new ItemFragment(LostItem.class);
+    private final Fragment foundFragment = new ItemFragment(FoundItem.class);
     private final Fragment profileFragment = new ProfileFragment();
-    private final Fragment mapFragment = new ItemMapFragment((LostFragment) lostFragment, (FoundFragment) foundFragment);
+    private final Fragment mapFragment = new ItemMapFragment((ItemFragment) lostFragment, (ItemFragment) foundFragment);
 
     private Fragment currentFragment;
     private int menuPosition;
@@ -95,9 +94,9 @@ public class MainActivity extends AppCompatActivity {
         if(intent.hasExtra(Item.class.getSimpleName())) {
             Item item = intent.getParcelableExtra(Item.class.getSimpleName());
             if(item instanceof LostItem) {
-                ((LostFragment) lostFragment).addLostItem((LostItem) item);
+                ((ItemFragment) lostFragment).addItem(item);
             } else if(item instanceof FoundItem) {
-                ((FoundFragment) foundFragment).addFoundItem((FoundItem) item);
+                ((ItemFragment) foundFragment).addItem(item);
             }
         }
     }

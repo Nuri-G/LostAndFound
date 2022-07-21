@@ -15,30 +15,37 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.codepath.nurivan.lostandfound.R;
 import com.codepath.nurivan.lostandfound.activities.ItemNameActivity;
 import com.codepath.nurivan.lostandfound.adapters.ItemAdapter;
-import com.codepath.nurivan.lostandfound.databinding.FragmentFoundBinding;
+import com.codepath.nurivan.lostandfound.databinding.FragmentItemsBinding;
 import com.codepath.nurivan.lostandfound.models.Item;
 import com.codepath.nurivan.lostandfound.models.FoundItem;
+import com.codepath.nurivan.lostandfound.models.LostItem;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FoundFragment extends Fragment {
-    public static final String TAG = "FoundFragment";
+public class ItemFragment extends Fragment {
+    public static final String TAG = "ItemFragment";
 
     private final List<Item> items = new ArrayList<>();
     private static String lastUserId = "";
 
-    private FragmentFoundBinding binding;
+    private FragmentItemsBinding binding;
     private ItemAdapter adapter;
     private boolean loading;
 
-    public FoundFragment() {
+    //LostItem or FoundItem
+    private final Class<? extends Item> itemType;
+
+    public ItemFragment(Class<? extends Item> itemType) {
         loading = true;
-        getFoundItems(true, 0);
+        this.itemType = itemType;
+        getItems(true, 0);
+
     }
 
     @Override
@@ -50,12 +57,17 @@ public class FoundFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = FragmentFoundBinding.inflate(inflater, container, false);
+        binding = FragmentItemsBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        if(itemType.equals(FoundItem.class)) {
+            binding.tvEmptyMessage.setText(R.string.found_items_empty);
+        } else if(itemType.equals(LostItem.class)) {
+            binding.tvEmptyMessage.setText(R.string.lost_items_empty);
+        }
         binding.bAdd.setOnClickListener(v -> showItemNameActivity());
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         binding.rvFoundItems.setLayoutManager(layoutManager);
@@ -71,7 +83,7 @@ public class FoundFragment extends Fragment {
                     if(!loading) {
                         if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
                             loading = true;
-                            getFoundItems(false, totalItemCount);
+                            getItems(false, totalItemCount);
                         }
                     }
                 }
@@ -81,9 +93,9 @@ public class FoundFragment extends Fragment {
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemAdapter.SwipeHelper(binding.getRoot(), adapter));
         itemTouchHelper.attachToRecyclerView(binding.rvFoundItems);
 
-        binding.swipeRefreshFound.setOnRefreshListener(this::getFoundItems);
+        binding.swipeRefreshFound.setOnRefreshListener(this::getItems);
         if(items.isEmpty()) {
-            binding.tvEmptyMessageFound.setVisibility(View.VISIBLE);
+            binding.tvEmptyMessage.setVisibility(View.VISIBLE);
         }
     }
 
@@ -96,7 +108,7 @@ public class FoundFragment extends Fragment {
         String currentUserId = ParseUser.getCurrentUser().getObjectId();
         if(!lastUserId.equals(currentUserId)) {
             lastUserId = currentUserId;
-            getFoundItems();
+            getItems();
         }
     }
 
@@ -115,17 +127,22 @@ public class FoundFragment extends Fragment {
     }
 
     //Loads from cache if firstLoad is true.
-    private void getFoundItems(boolean firstLoad, int skip) {
+    private void getItems(boolean firstLoad, int skip) {
         if(binding != null) {
             binding.swipeRefreshFound.setRefreshing(true);
         }
-        ParseQuery<FoundItem> query = ParseQuery.getQuery(FoundItem.class);
+        ParseQuery<? extends Item> query = ParseQuery.getQuery(itemType);
         if(firstLoad) {
             query.setCachePolicy(ParseQuery.CachePolicy.CACHE_ONLY);
         } else {
             query.setCachePolicy(ParseQuery.CachePolicy.NETWORK_ONLY);
         }
-        query.whereEqualTo(FoundItem.KEY_FOUND_BY, ParseUser.getCurrentUser());
+        if(itemType.equals(FoundItem.class)) {
+            query.whereEqualTo(FoundItem.KEY_FOUND_BY, ParseUser.getCurrentUser());
+        } else if(itemType.equals(LostItem.class)) {
+            query.whereEqualTo(LostItem.KEY_LOST_BY, ParseUser.getCurrentUser());
+        }
+
         query.setSkip(skip);
         int QUERY_LIMIT = 20;
         query.setLimit(QUERY_LIMIT);
@@ -135,7 +152,7 @@ public class FoundFragment extends Fragment {
                     Log.e(TAG, "Error getting found items.", e);
                     Context context = getContext();
                     if(context != null) {
-                        Toast.makeText(context, "Error getting found items.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Error getting items.", Toast.LENGTH_SHORT).show();
                     }
                 }
             } else if(skip == 0){
@@ -156,26 +173,26 @@ public class FoundFragment extends Fragment {
 
             if(binding != null) {
                 if(objects != null && objects.isEmpty()) {
-                    binding.tvEmptyMessageFound.setVisibility(View.VISIBLE);
+                    binding.tvEmptyMessage.setVisibility(View.VISIBLE);
                 } else {
-                    binding.tvEmptyMessageFound.setVisibility(View.GONE);
+                    binding.tvEmptyMessage.setVisibility(View.GONE);
                 }
                 binding.swipeRefreshFound.setRefreshing(false);
             }
 
             if(firstLoad) {
-                getFoundItems(false, 0);
+                getItems(false, 0);
             } else {
                 loading = false;
             }
         });
     }
 
-    private void getFoundItems() {
-        getFoundItems(false, 0);
+    private void getItems() {
+        getItems(false, 0);
     }
 
-    public void addFoundItem(FoundItem item) {
+    public void addItem(Item item) {
         for(int i = 0; i < items.size(); i++) {
             if(items.get(i).getObjectId().equals(item.getObjectId())) {
                 items.set(i, item);
@@ -190,7 +207,7 @@ public class FoundFragment extends Fragment {
             adapter.notifyItemInserted(items.size() - 1);
         }
         if(binding != null) {
-            binding.tvEmptyMessageFound.setVisibility(View.GONE);
+            binding.tvEmptyMessage.setVisibility(View.GONE);
         }
     }
 

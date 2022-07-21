@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.FoundFragment">
+    tools:context=".fragments.ItemFragment">
 
     <TextView
-        android:id="@+id/tvEmptyMessageFound"
+        android:id="@+id/tvEmptyMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="10dp"
-        android:text="@string/press_the_quot_quot_button_to_add_found_items"
+        android:text="@string/tap_the_quot_quot_button_to_add_items"
         android:visibility="gone"
         app:layout_anchor="@+id/swipeRefreshFound"
         app:layout_anchorGravity="top|center" />
