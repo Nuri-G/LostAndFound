@@ -25,13 +25,13 @@ public class MainActivity extends AppCompatActivity {
 
     private FragmentManager fragmentManager;
 
-    private final Fragment lostFragment = new ItemFragment(LostItem.class);
-    private final Fragment foundFragment = new ItemFragment(FoundItem.class);
+    private final Fragment lostFragment = ItemFragment.newInstance(LostItem.class);
+    private final Fragment foundFragment = ItemFragment.newInstance(FoundItem.class);
     private final Fragment profileFragment = new ProfileFragment();
-    private final Fragment mapFragment = new ItemMapFragment((ItemFragment) lostFragment, (ItemFragment) foundFragment);
+    private final Fragment mapFragment = ItemMapFragment.newInstance(((ItemFragment) lostFragment).getItemList(), ((ItemFragment) foundFragment).getItemList());
 
     private Fragment currentFragment;
-    private int menuPosition;
+    private int menuPosition = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,8 +41,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(view);
 
         fragmentManager = getSupportFragmentManager();
-        menuPosition = 0;
-
         binding.bottomNavigation.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             int newPosition;

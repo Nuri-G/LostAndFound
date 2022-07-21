@@ -47,27 +47,37 @@ public class ItemMapFragment extends Fragment implements GoogleMap.OnMapClickLis
 
     private Context context;
     private FragmentItemMapBinding binding;
+    public static final String EXTRA_LOST_ITEMS = "lostItems";
+    public static final String EXTRA_FOUND_ITEMS = "foundItems";
 
-    private final ItemFragment lostFragment;
-    private final ItemFragment foundFragment;
+    private ArrayList<Item> lostItems;
+    private ArrayList<Item> foundItems;
     private GoogleMap googleMap;
     private Marker lastClickMarker;
 
-    public ItemMapFragment(ItemFragment lostFragment, ItemFragment foundFragment) {
-        this.lostFragment = lostFragment;
-        this.foundFragment = foundFragment;
+    public ItemMapFragment() {
+        // Required empty public constructor
+    }
+
+    public static ItemMapFragment newInstance(ArrayList<Item> lostItems, ArrayList<Item> foundItems) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelableArrayList(EXTRA_LOST_ITEMS, lostItems);
+        bundle.putParcelableArrayList(EXTRA_FOUND_ITEMS, foundItems);
+        ItemMapFragment fragment = new ItemMapFragment();
+        fragment.setArguments(bundle);
+        fragment.lostItems = lostItems;
+        fragment.foundItems = foundItems;
+        return fragment;
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        assert getArguments() != null;
+        lostItems = getArguments().getParcelableArrayList(EXTRA_LOST_ITEMS);
+        foundItems = getArguments().getParcelableArrayList(EXTRA_FOUND_ITEMS);
         binding = FragmentItemMapBinding.inflate(inflater, container, false);
         return binding.getRoot();
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-
     }
 
     @Override
@@ -214,8 +224,8 @@ public class ItemMapFragment extends Fragment implements GoogleMap.OnMapClickLis
     public void setMapPins() {
         googleMap.clear();
         List<Item> allItems = new ArrayList<>();
-        allItems.addAll(lostFragment.getItemList());
-        allItems.addAll(foundFragment.getItemList());
+        allItems.addAll(lostItems);
+        allItems.addAll(foundItems);
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         for(Item item : allItems) {
             MarkerOptions options = new MarkerOptions();

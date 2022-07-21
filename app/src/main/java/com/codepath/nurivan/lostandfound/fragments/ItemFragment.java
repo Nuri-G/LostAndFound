@@ -19,19 +19,21 @@ import com.codepath.nurivan.lostandfound.R;
 import com.codepath.nurivan.lostandfound.activities.ItemNameActivity;
 import com.codepath.nurivan.lostandfound.adapters.ItemAdapter;
 import com.codepath.nurivan.lostandfound.databinding.FragmentItemsBinding;
-import com.codepath.nurivan.lostandfound.models.Item;
 import com.codepath.nurivan.lostandfound.models.FoundItem;
+import com.codepath.nurivan.lostandfound.models.Item;
 import com.codepath.nurivan.lostandfound.models.LostItem;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ItemFragment extends Fragment {
     public static final String TAG = "ItemFragment";
 
-    private final List<Item> items = new ArrayList<>();
+    private static final String EXTRA_TYPE = "itemType";
+    private static final String EXTRA_LOADING = "loading";
+
+    private final ArrayList<Item> items = new ArrayList<>();
     private static String lastUserId = "";
 
     private FragmentItemsBinding binding;
@@ -39,18 +41,33 @@ public class ItemFragment extends Fragment {
     private boolean loading;
 
     //LostItem or FoundItem
-    private final Class<? extends Item> itemType;
+    private Class<? extends Item> itemType;
 
-    public ItemFragment(Class<? extends Item> itemType) {
-        loading = true;
-        this.itemType = itemType;
-        getItems(true, 0);
+    public ItemFragment() {
+        // Required empty public constructor
+    }
+
+    public static ItemFragment newInstance(Class<? extends Item> itemType) {
+        Bundle bundle = new Bundle(2);
+        bundle.putSerializable(EXTRA_TYPE, itemType);
+        bundle.putBoolean(EXTRA_LOADING, true);
+        ItemFragment fragment = new ItemFragment();
+        fragment.setArguments(bundle);
+        fragment.itemType = itemType;
+        fragment.loading = true;
+        fragment.getItems(true, 0);
+        return fragment;
 
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        assert getArguments() != null;
+        loading = getArguments().getBoolean(EXTRA_LOADING);
+        @SuppressWarnings("unchecked")
+        Class<? extends Item> typeClass = (Class<? extends Item>) getArguments().getSerializable(EXTRA_TYPE);
+        itemType = typeClass;
         adapter = new ItemAdapter(getContext(), items);
     }
 
@@ -211,7 +228,7 @@ public class ItemFragment extends Fragment {
         }
     }
 
-    public List<Item> getItemList() {
+    public ArrayList<Item> getItemList() {
         return items;
     }
 }
