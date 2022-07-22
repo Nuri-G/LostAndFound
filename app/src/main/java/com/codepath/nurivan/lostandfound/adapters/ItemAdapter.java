@@ -4,6 +4,7 @@ import static com.codepath.nurivan.lostandfound.models.Item.formatItemName;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,9 +13,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.codepath.nurivan.lostandfound.R;
 import com.codepath.nurivan.lostandfound.activities.ItemDetailsActivity;
 import com.codepath.nurivan.lostandfound.databinding.ItemLayoutBinding;
 import com.codepath.nurivan.lostandfound.models.FoundItem;
@@ -24,6 +27,8 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Date;
 import java.util.List;
+
+import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
     public static final String TAG = "ItemAdapter";
@@ -48,8 +53,17 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         holder.bind(item);
     }
 
-    private void deleteItem(int index) {
-        Item item = items.get(index);
+    private void beforeDelete(int index) {
+        items.remove(index);
+        notifyItemRemoved(index);
+    }
+
+    private void cancelDelete(Item item, int index) {
+        items.add(index, item);
+        notifyItemInserted(index);
+    }
+
+    private void deleteItem(Item item) {
         item.deleteInBackground(e -> {
             if(e != null) {
                 Log.e(TAG, "Failed to delete item", e);
@@ -57,8 +71,6 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
             }
             Toast.makeText(context, "Item deleted.", Toast.LENGTH_SHORT).show();
         });
-        items.remove(index);
-        notifyItemRemoved(index);
     }
 
     @Override
@@ -130,7 +142,10 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
 
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-            int position = viewHolder.getAdapterPosition();
+            int position = viewHolder.getBindingAdapterPosition();
+
+            Item item = adapter.items.get(position);
+            adapter.beforeDelete(position);
 
             Snackbar snackbar = Snackbar
                     .make(layout, "Deleting item.", Snackbar.LENGTH_SHORT);
@@ -140,9 +155,9 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
                 @Override
                 public void onDismissed(Snackbar snackbar, int event) {
                     if(cancelDelete) {
-                        adapter.notifyItemChanged(position);
+                        adapter.cancelDelete(item, position);
                     } else {
-                        adapter.deleteItem(position);
+                        adapter.deleteItem(item);
                     }
 
                     cancelDelete = false;
@@ -150,6 +165,16 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
             });
             snackbar.show();
 
+        }
+
+        @Override
+        public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+            super.onChildDraw(c, recyclerView, viewHolder, dX/4, dY, actionState, isCurrentlyActive);
+            new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                    .addSwipeLeftActionIcon(R.drawable.ic_baseline_delete_forever_24)
+                    .addSwipeLeftBackgroundColor(ContextCompat.getColor(adapter.context, R.color.deleteColor))
+                    .create()
+                    .decorate();
         }
     }
 }

@@ -10,4 +10,5 @@
     <color name="secondaryTextColor">#ffffff</color>
     <color name="backgroundColorLight">#ECECEC</color>
     <color name="backgroundColorDark">#222222</color>
+    <color name="deleteColor">#FF5555</color>
 </resources>

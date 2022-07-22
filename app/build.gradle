@@ -48,10 +48,11 @@ dependencies {
     implementation "com.github.parse-community.Parse-SDK-Android:parse:4.0.0"
     implementation "com.github.parse-community.Parse-SDK-Android:fcm:4.0.0"
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
-    implementation 'com.google.android.gms:play-services-maps:18.0.2'
+    implementation 'com.google.android.gms:play-services-maps:18.1.0'
 
     implementation platform('com.google.firebase:firebase-bom:30.2.0')
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'nl.dionsegijn:konfetti-xml:2.0.2'
     implementation 'org.mnode.ical4j:ical4j:3.2.4'
+    implementation 'com.github.xabaras:RecyclerViewSwipeDecorator:1.4'
 }
