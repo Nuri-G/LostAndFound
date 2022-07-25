@@ -107,7 +107,7 @@ public class ItemFragment extends Fragment {
             }
         });
 
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemAdapter.SwipeHelper(binding.getRoot(), adapter));
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemAdapter.SwipeHelper(adapter));
         itemTouchHelper.attachToRecyclerView(binding.rvFoundItems);
 
         binding.swipeRefreshFound.setOnRefreshListener(this::getItems);
@@ -136,7 +136,13 @@ public class ItemFragment extends Fragment {
     }
 
     private void showItemNameActivity() {
-        Item item = new FoundItem();
+        Item item;
+        if(itemType.equals(LostItem.class)) {
+            item = new LostItem();
+        } else {
+            item = new FoundItem();
+        }
+
         Intent i = new Intent(getActivity(), ItemNameActivity.class);
         i.putExtra(Item.class.getSimpleName(), item);
 
