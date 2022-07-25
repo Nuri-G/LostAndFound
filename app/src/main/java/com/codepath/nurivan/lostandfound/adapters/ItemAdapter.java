@@ -2,6 +2,7 @@ package com.codepath.nurivan.lostandfound.adapters;
 
 import static com.codepath.nurivan.lostandfound.models.Item.formatItemName;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
@@ -12,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,7 +23,6 @@ import com.codepath.nurivan.lostandfound.databinding.ItemLayoutBinding;
 import com.codepath.nurivan.lostandfound.models.FoundItem;
 import com.codepath.nurivan.lostandfound.models.Item;
 import com.codepath.nurivan.lostandfound.models.LostItem;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Date;
 import java.util.List;
@@ -126,13 +125,10 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
 
     public static class SwipeHelper extends ItemTouchHelper.SimpleCallback {
         private final ItemAdapter adapter;
-        private final CoordinatorLayout layout;
-        private boolean cancelDelete = false;
 
-        public SwipeHelper(CoordinatorLayout layout, ItemAdapter adapter) {
+        public SwipeHelper(ItemAdapter adapter) {
             super(0, ItemTouchHelper.LEFT);
             this.adapter = adapter;
-            this.layout = layout;
         }
 
         @Override
@@ -147,23 +143,13 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
             Item item = adapter.items.get(position);
             adapter.beforeDelete(position);
 
-            Snackbar snackbar = Snackbar
-                    .make(layout, "Deleting item.", Snackbar.LENGTH_SHORT);
-            snackbar.setAction("CANCEL", view -> cancelDelete = true);
+            AlertDialog.Builder builder = new AlertDialog.Builder(adapter.context);
+            builder.setTitle("Delete item?");
+            builder.setMessage("Once deleted, the item cannot be recovered.");
+            builder.setNegativeButton("Cancel", (dialog, which) -> adapter.cancelDelete(item, position));
+            builder.setPositiveButton("Confirm", (dialog, which) -> adapter.deleteItem(item));
 
-            snackbar.addCallback(new Snackbar.Callback() {
-                @Override
-                public void onDismissed(Snackbar snackbar, int event) {
-                    if(cancelDelete) {
-                        adapter.cancelDelete(item, position);
-                    } else {
-                        adapter.deleteItem(item);
-                    }
-
-                    cancelDelete = false;
-                }
-            });
-            snackbar.show();
+            builder.create().show();
 
         }
 
